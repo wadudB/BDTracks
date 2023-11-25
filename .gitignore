@@ -1,0 +1,16 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+npm-debug.log
+
+# Environment files
+.env
+.env.local
+
+# System Files
+.DS_Store
+Thumbs.db
