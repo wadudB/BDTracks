@@ -1,22 +1,13 @@
-import { useState, useEffect } from "react";
-import "./App.css";
+import Navbar from "./components/Navbar";
+import Dashboard from "./components/Dashboard";
 
-function App() {
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    fetch("/api/hello")
-      .then((response) => response.json())
-      .then((data) => setMessage(data.message));
-  }, []);
-
+const App = () => {
   return (
     <div className="App">
-      <header className="App-header">
-        <p>{message}</p>
-      </header>
+      <Navbar />
+      <Dashboard />
     </div>
   );
-}
+};
 
 export default App;
