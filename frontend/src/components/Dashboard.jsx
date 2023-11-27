@@ -1,3 +1,7 @@
+import { useState, useEffect } from "react";
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import LatestAccidents from "./LatestAccidents";
+import "leaflet/dist/leaflet.css";
 import {
   Typography,
   Paper,
@@ -5,13 +9,20 @@ import {
   Unstable_Grid2 as Grid2,
   Divider,
 } from "@mui/material";
-// import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import Chart from "./Chart";
 import SourceMediumChart from "./SourceMediumChart";
 
 const Dashboard = () => {
-  //   const geoUrl = "/small_bangladesh_geojson_adm0_whole_bangladesh_outline.json";
-  //   console.log(geoUrl);
+  const [geojsonData, setGeojsonData] = useState(null);
+
+  useEffect(() => {
+    // Replace with your URL for fetching the GeoJSON data
+    const geojsonURL = "/bangladesh_geojson_adm2_64_districts_zillas.json";
+
+    fetch(geojsonURL)
+      .then((response) => response.json())
+      .then((data) => setGeojsonData(data));
+  }, []);
   return (
     <Box className="container mx-auto pt-7">
       <Typography variant="h4" className="mb-4">
@@ -26,7 +37,10 @@ const Dashboard = () => {
         <Grid2 xs={12} md={5} container spacing={2}>
           {/* First row of metric cards */}
           <Grid2 xs={6} md={12} lg={6}>
-            <Paper className="p-4 flex flex-col justify-between h-full">
+            <Paper
+              className="p-4 flex flex-col justify-between h-full"
+              style={{ backgroundColor: "#202940", borderRadius: "8px" }}
+            >
               <Box>
                 <Typography variant="subtitle2">Total accident</Typography>
                 <Typography variant="h5" className="font-bold">
@@ -39,7 +53,10 @@ const Dashboard = () => {
             </Paper>
           </Grid2>
           <Grid2 xs={6} md={12} lg={6}>
-            <Paper className="p-4 flex flex-col justify-between h-full">
+            <Paper
+              className="p-4 flex flex-col justify-between h-full"
+              style={{ backgroundColor: "#202940", borderRadius: "8px" }}
+            >
               <Box>
                 <Typography variant="subtitle2">Injured</Typography>
                 <Typography variant="h5" className="font-bold">
@@ -53,7 +70,10 @@ const Dashboard = () => {
           </Grid2>
           {/* Second row of metric cards */}
           <Grid2 xs={6} md={12} lg={6}>
-            <Paper className="p-4 flex flex-col justify-between h-full">
+            <Paper
+              className="p-4 flex flex-col justify-between h-full"
+              style={{ backgroundColor: "#202940", borderRadius: "8px" }}
+            >
               <Box>
                 <Typography variant="subtitle2">Fatal</Typography>
                 <Typography variant="h5" className="font-bold">
@@ -66,7 +86,10 @@ const Dashboard = () => {
             </Paper>
           </Grid2>
           <Grid2 xs={6} md={12} lg={6}>
-            <Paper className="p-4 flex flex-col justify-between h-full">
+            <Paper
+              className="p-4 flex flex-col justify-between h-full"
+              style={{ backgroundColor: "#202940", borderRadius: "8px" }}
+            >
               <Box>
                 <Typography variant="subtitle2">Visitors</Typography>
                 <Typography variant="h5" className="font-bold">
@@ -82,7 +105,10 @@ const Dashboard = () => {
 
         {/* Chart section */}
         <Grid2 xs={12} md={7}>
-          <Paper className="p-4 h-full">
+          <Paper
+            className="p-4 h-full"
+            style={{ backgroundColor: "#202940", borderRadius: "8px" }}
+          >
             <Typography variant="subtitle2" className="mb-4">
               Death / Injured
             </Typography>
@@ -92,33 +118,55 @@ const Dashboard = () => {
       </Grid2>
       <Box className="pt-7">
         <Grid2 container spacing={2}>
-          {/* <Grid2 xs={12} md={6}>
-            <Paper className="p-4 h-full">
+          <Grid2 xs={12} md={8}>
+            <Paper
+              className="p-4 h-full bg-dashboard-dark"
+              style={{ backgroundColor: "#202940", borderRadius: "8px" }}
+            >
               <Typography variant="subtitle2" className="mb-4">
                 Real-Time
               </Typography>
-              <ComposableMap
-                projection="geoAzimuthalEqualArea"
-                projectionConfig={{ scale: 4000 }}
+              <MapContainer
+                center={[23.685, 90.3563]}
+                zoom={7}
+                style={{ height: "400px", width: "100%" }}
               >
-                <Geographies geography={geoUrl}>
-                  {({ geographies }) =>
-                    geographies.map((geo) => (
-                      <Geography key={geo.rsmKey} geography={geo} />
-                    ))
-                  }
-                </Geographies>
-              </ComposableMap>
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                {geojsonData && (
+                  <GeoJSON
+                    data={geojsonData}
+                    // style={style}
+                    // onEachFeature={onEachFeature}
+                  />
+                )}
+              </MapContainer>
             </Paper>
-          </Grid2> */}
-          {/* Source / Medium Section */}
-          <Grid2 xs={12} md={6}>
-            <Paper className="p-4 h-full">
+          </Grid2>
+          {/* {/* Source / Medium Section */}
+          <Grid2 xs={12} md={4}>
+            <Paper
+              className="p-4 flex flex-col justify-between h-full"
+              style={{ backgroundColor: "#202940", borderRadius: "8px" }}
+            >
               <Typography variant="subtitle2" className="mb-4">
                 Source / Medium
               </Typography>
               <SourceMediumChart />
             </Paper>
+          </Grid2>
+        </Grid2>
+      </Box>
+      <Box className="pt-7">
+        <Grid2 container spacing={2}>
+          <Grid2
+            xs={12}
+            md={12}
+            style={{ backgroundColor: "#202940", borderRadius: "8px" }}
+          >
+            <LatestAccidents />
           </Grid2>
         </Grid2>
       </Box>
