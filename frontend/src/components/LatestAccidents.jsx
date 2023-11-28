@@ -16,10 +16,39 @@ const trafficData = [
     bounceRate: "30%",
     duration: "00:06:25",
   },
-  // ... add other sources here
+  {
+    source: "Google",
+    users: 1023,
+    sessions: 1265,
+    bounceRate: "30%",
+    duration: "00:06:25",
+  },
+  {
+    source: "Google",
+    users: 1023,
+    sessions: 1265,
+    bounceRate: "30%",
+    duration: "00:06:25",
+  },
+  {
+    source: "Google",
+    users: 1023,
+    sessions: 1265,
+    bounceRate: "30%",
+    duration: "00:06:25",
+  },
+  {
+    source: "Google",
+    users: 1023,
+    sessions: 1265,
+    bounceRate: "30%",
+    duration: "00:06:25",
+  },
 ];
 
 const LatestAccidents = () => {
+  const cellStyle = { color: "white" };
+
   return (
     <TableContainer
       component={Paper}
@@ -29,32 +58,39 @@ const LatestAccidents = () => {
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell>Source</TableCell>
-            <TableCell align="right">Users</TableCell>
-            <TableCell align="right">Sessions</TableCell>
-            <TableCell align="right">Bounce Rate</TableCell>
-            <TableCell align="right">Avg. Session Duration</TableCell>
+            <TableCell sx={cellStyle}>Source</TableCell>
+            <TableCell sx={cellStyle} align="right">
+              Users
+            </TableCell>
+            <TableCell sx={cellStyle} align="right">
+              Sessions
+            </TableCell>
+            <TableCell sx={cellStyle} align="right">
+              Bounce Rate
+            </TableCell>
+            <TableCell sx={cellStyle} align="right">
+              Avg. Session Duration
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {trafficData.map((row) => (
-            <TableRow key={row.source}>
-              <TableCell component="th" scope="row">
+          {trafficData.map((row, index) => (
+            <TableRow key={index}>
+              <TableCell sx={cellStyle} component="th" scope="row">
                 {row.source}
               </TableCell>
-              <TableCell align="right">{row.users}</TableCell>
-              <TableCell align="right">{row.sessions}</TableCell>
-              <TableCell
-                align="right"
-                className={
-                  row.bounceRate.includes("63%")
-                    ? "text-red-500"
-                    : "text-green-500"
-                }
-              >
+              <TableCell sx={cellStyle} align="right">
+                {row.users}
+              </TableCell>
+              <TableCell sx={cellStyle} align="right">
+                {row.sessions}
+              </TableCell>
+              <TableCell sx={cellStyle} align="right">
                 {row.bounceRate}
               </TableCell>
-              <TableCell align="right">{row.duration}</TableCell>
+              <TableCell sx={cellStyle} align="right">
+                {row.duration}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

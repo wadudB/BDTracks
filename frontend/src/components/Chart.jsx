@@ -1,13 +1,22 @@
+import { Bar } from "react-chartjs-2";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
   Tooltip,
   Legend,
-  ResponsiveContainer,
-} from "recharts";
+} from "chart.js";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const data = [
   { name: "Jan", Death: 4000, Injured: 2400 },
@@ -21,18 +30,40 @@ const data = [
 ];
 
 const Chart = () => {
+  const chartData = {
+    labels: data.map((item) => item.name),
+    datasets: [
+      {
+        label: "Death",
+        data: data.map((item) => item.Death),
+        backgroundColor: "rgba(136, 132, 216, 0.5)",
+        borderColor: "rgba(136, 132, 216, 1)",
+        borderWidth: 1,
+      },
+      {
+        label: "Injured",
+        data: data.map((item) => item.Injured),
+        backgroundColor: "rgba(130, 202, 157, 0.5)",
+        borderColor: "rgba(130, 202, 157, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const options = {
+    scales: {
+      y: {
+        beginAtZero: true,
+      },
+    },
+    responsive: true,
+    maintainAspectRatio: false,
+  };
+
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="Death" fill="#8884d8" />
-        <Bar dataKey="Injured" fill="#82ca9d" />
-      </BarChart>
-    </ResponsiveContainer>
+    <div style={{ height: "300px" }}>
+      <Bar data={chartData} options={options} />
+    </div>
   );
 };
 
