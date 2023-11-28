@@ -7,46 +7,9 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
+import PropTypes from "prop-types";
 
-const trafficData = [
-  {
-    source: "Google",
-    users: 1023,
-    sessions: 1265,
-    bounceRate: "30%",
-    duration: "00:06:25",
-  },
-  {
-    source: "Google",
-    users: 1023,
-    sessions: 1265,
-    bounceRate: "30%",
-    duration: "00:06:25",
-  },
-  {
-    source: "Google",
-    users: 1023,
-    sessions: 1265,
-    bounceRate: "30%",
-    duration: "00:06:25",
-  },
-  {
-    source: "Google",
-    users: 1023,
-    sessions: 1265,
-    bounceRate: "30%",
-    duration: "00:06:25",
-  },
-  {
-    source: "Google",
-    users: 1023,
-    sessions: 1265,
-    bounceRate: "30%",
-    duration: "00:06:25",
-  },
-];
-
-const LatestAccidents = () => {
+const LatestAccidents = ({ accidentData }) => {
   const cellStyle = { color: "white" };
 
   return (
@@ -58,38 +21,44 @@ const LatestAccidents = () => {
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell sx={cellStyle}>Source</TableCell>
+            <TableCell sx={cellStyle}>Date Time</TableCell>
             <TableCell sx={cellStyle} align="right">
-              Users
+              Injured
             </TableCell>
             <TableCell sx={cellStyle} align="right">
-              Sessions
+              Killed
             </TableCell>
             <TableCell sx={cellStyle} align="right">
-              Bounce Rate
+              Location
             </TableCell>
             <TableCell sx={cellStyle} align="right">
-              Avg. Session Duration
+              District
+            </TableCell>
+            <TableCell sx={cellStyle} align="right">
+              Accident Type
             </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {trafficData.map((row, index) => (
+          {accidentData.map((row, index) => (
             <TableRow key={index}>
               <TableCell sx={cellStyle} component="th" scope="row">
-                {row.source}
+                {row["ACCIDENT Datetime_from_url"] || "Not Available"}
               </TableCell>
               <TableCell sx={cellStyle} align="right">
-                {row.users}
+                {row["Total Number of People Injured"] || "Not Available"}
               </TableCell>
               <TableCell sx={cellStyle} align="right">
-                {row.sessions}
+                {row["Total Number of People Killed"] || "Not Available"}
               </TableCell>
               <TableCell sx={cellStyle} align="right">
-                {row.bounceRate}
+                {row["Exact Location of Accident"] || "Not Available"}
               </TableCell>
               <TableCell sx={cellStyle} align="right">
-                {row.duration}
+                {row["District of Accident"] || "Not Available"}
+              </TableCell>
+              <TableCell sx={cellStyle} align="right">
+                {row["Accident_Type"] || "Not Available"}
               </TableCell>
             </TableRow>
           ))}
@@ -100,3 +69,16 @@ const LatestAccidents = () => {
 };
 
 export default LatestAccidents;
+
+LatestAccidents.propTypes = {
+  accidentData: PropTypes.arrayOf(
+    PropTypes.shape({
+      "ACCIDENT Datetime_from_url": PropTypes.string.isRequired,
+      "Total Number of People Injured": PropTypes.string.isRequired,
+      "Total Number of People Killed": PropTypes.string.isRequired,
+      "Exact Location of Accident": PropTypes.string.isRequired,
+      "District of Accident": PropTypes.string.isRequired,
+      Accident_Type: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+};

@@ -15,6 +15,21 @@ import DashboardPaper from "../components/DashboardPaper"; // Import the new com
 
 const Dashboard = () => {
   const [geojsonData, setGeojsonData] = useState(null);
+  const [accidentData, setAccidentdata] = useState([]);
+
+  // Function to fetch data from Flask API
+  const fetchData = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/data");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const jsonData = await response.json();
+      setAccidentdata(jsonData);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
+  };
 
   useEffect(() => {
     const geojsonURL = "/bangladesh_geojson_adm2_64_districts_zillas.json";
@@ -23,6 +38,11 @@ const Dashboard = () => {
       .then((data) => setGeojsonData(data));
   }, []);
 
+  // useEffect to call fetchData on component mount
+  useEffect(() => {
+    fetchData();
+  }, []); // The empty array ensures this effect runs once on mount
+  console.log("Fetching data", accidentData);
   return (
     <Box className="container mx-auto pt-7 mb-5" style={{ maxWidth: "85%" }}>
       <Typography variant="h4" className="mb-4">
@@ -100,7 +120,12 @@ const Dashboard = () => {
         </Grid2>
         <Grid2 xs={12} container spacing={2}>
           <Grid2 xs={12} md={12}>
-            <LatestAccidents />
+            <DashboardPaper>
+              <Typography variant="subtitle2" className="!text-lg">
+                Recent Accident Reports
+              </Typography>
+              <LatestAccidents accidentData={accidentData} />
+            </DashboardPaper>
           </Grid2>
         </Grid2>
       </Grid2>
