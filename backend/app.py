@@ -22,24 +22,29 @@ def get_data():
     # Your specific SQL query
     query = """
     SELECT 
-        `Total Number of People Killed`,
-        `Total Number of People Injured`,
-        `Reason_or_cause_for_Accident`,
-        `ACCIDENT Datetime_from_url`,
-        `Exact Location of Accident`,
-        `District of Accident`,
-        `Accident_Type` 
-    FROM `all_accidents_data` 
-    WHERE `Country? (Bangladesh or Other country)` = "Bangladesh" 
-    ORDER BY u_id DESC 
-    LIMIT 5
+        `total_number_of_people_killed`,
+        `total_number_of_people_injured`,
+        `reason_or_cause_for_accident`,
+        `accident_datetime_from_url`,
+        `exact_location_of_accident`,
+        `district_of_accident`,
+        `accident_type`,
+        `primary_vehicle_involved`,
+        `secondary_vehicle_involved`,
+        `tertiary_vehicle_involved`
+    FROM `bangladesh_daily_accidents_2023` 
+    # WHERE `is_country_bangladesh_or_other_country` = "Bangladesh" 
+    # AND `is_the_accident_data_yearly_monthly_or_daily` = "daily"
+    ORDER BY `accident_datetime_from_url` DESC;
     """
+
+    # LIMIT 2000;
     cursor.execute(query)
     rows = cursor.fetchall()
 
     cursor.close()
     conn.close()
-    print((rows))
+    # print((rows))
     return jsonify(rows)
 
 

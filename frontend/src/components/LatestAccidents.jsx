@@ -12,6 +12,8 @@ import PropTypes from "prop-types";
 const LatestAccidents = ({ accidentData }) => {
   const cellStyle = { color: "white" };
 
+  const latestAccidents = accidentData.slice(0, 7);
+
   return (
     <TableContainer
       component={Paper}
@@ -40,25 +42,27 @@ const LatestAccidents = ({ accidentData }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {accidentData.map((row, index) => (
+          {latestAccidents.map((row, index) => (
             <TableRow key={index}>
               <TableCell sx={cellStyle} component="th" scope="row">
-                {row["ACCIDENT Datetime_from_url"] || "Not Available"}
+                {row.accident_datetime_from_url || "Not Available"}
               </TableCell>
               <TableCell sx={cellStyle} align="right">
-                {row["Total Number of People Injured"] || "Not Available"}
+                {Math.floor(row.total_number_of_people_injured) ||
+                  "Not Available"}
               </TableCell>
               <TableCell sx={cellStyle} align="right">
-                {row["Total Number of People Killed"] || "Not Available"}
+                {Math.floor(row.total_number_of_people_killed) ||
+                  "Not Available"}
               </TableCell>
               <TableCell sx={cellStyle} align="right">
-                {row["Exact Location of Accident"] || "Not Available"}
+                {row.exact_location_of_accident || "Not Available"}
               </TableCell>
               <TableCell sx={cellStyle} align="right">
-                {row["District of Accident"] || "Not Available"}
+                {row.district_of_accident || "Not Available"}
               </TableCell>
               <TableCell sx={cellStyle} align="right">
-                {row["Accident_Type"] || "Not Available"}
+                {row.accident_type || "Not Available"}
               </TableCell>
             </TableRow>
           ))}
@@ -67,18 +71,16 @@ const LatestAccidents = ({ accidentData }) => {
     </TableContainer>
   );
 };
-
-export default LatestAccidents;
-
 LatestAccidents.propTypes = {
   accidentData: PropTypes.arrayOf(
     PropTypes.shape({
-      "ACCIDENT Datetime_from_url": PropTypes.string.isRequired,
-      "Total Number of People Injured": PropTypes.string.isRequired,
-      "Total Number of People Killed": PropTypes.string.isRequired,
-      "Exact Location of Accident": PropTypes.string.isRequired,
-      "District of Accident": PropTypes.string.isRequired,
-      Accident_Type: PropTypes.string.isRequired,
+      accident_datetime_from_url: PropTypes.string.isRequired,
+      total_number_of_people_injured: PropTypes.string.isRequired,
+      total_number_of_people_killed: PropTypes.string.isRequired,
+      exact_location_of_accident: PropTypes.string.isRequired,
+      district_of_accident: PropTypes.string.isRequired,
+      accident_type: PropTypes.string.isRequired,
     })
   ).isRequired,
 };
+export default LatestAccidents;

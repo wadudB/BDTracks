@@ -15,15 +15,16 @@ const DashboardPaper = ({
         backgroundColor: "#202940",
         borderRadius: "8px",
         color: "white",
+        justifyContent: "center",
       }}
       {...props}
     >
-      {title && <Typography variant="subtitle2">{title}</Typography>}
       {statistic && (
-        <Typography variant="h5" className="font-bold">
+        <Typography variant="h5" className="font-bold text-green-500 pb-5">
           {statistic}
         </Typography>
       )}
+      {title && <Typography variant="subtitle1">{title}</Typography>}
       {statisticNote && (
         <Typography variant="body2" className="text-green-500">
           {statisticNote}
@@ -34,7 +35,7 @@ const DashboardPaper = ({
   );
 };
 
-// Define propTypes for the component
+// PropTypes for the component
 DashboardPaper.propTypes = {
   children: PropTypes.node,
   title: PropTypes.string,

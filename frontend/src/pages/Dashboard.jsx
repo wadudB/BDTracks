@@ -1,6 +1,8 @@
-// Dashboard.js
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+
 import "leaflet/dist/leaflet.css";
 import {
   Typography,
@@ -8,14 +10,30 @@ import {
   Unstable_Grid2 as Grid2,
   Divider,
 } from "@mui/material";
-import Chart from "../components/Chart";
-import SourceMediumChart from "../components/SourceMediumChart";
-import LatestAccidents from "../components/LatestAccidents";
-import DashboardPaper from "../components/DashboardPaper"; // Import the new component
+// import Chart from "../components/Chart";
+// import LineChart from "../components/LineChart";
+// import VehicleInvolvedChart from "../components/VehicleInvolvedChart";
+// import LatestAccidents from "../components/LatestAccidents";
+// import DashboardPaper from "../components/DashboardPaper"; // Import the new component
+
+const Chart = React.lazy(() => import("../components/Chart"));
+const LineChart = React.lazy(() => import("../components/LineChart"));
+const VehicleInvolvedChart = React.lazy(() =>
+  import("../components/VehicleInvolvedChart")
+);
+const LatestAccidents = React.lazy(() =>
+  import("../components/LatestAccidents")
+);
+const DashboardPaper = React.lazy(() => import("../components/DashboardPaper"));
 
 const Dashboard = () => {
   const [geojsonData, setGeojsonData] = useState(null);
   const [accidentData, setAccidentdata] = useState([]);
+  const [viewMode, setViewMode] = useState("monthly"); // 'monthly' or 'yearly'
+  const [totalAccidents, setTotalAccidents] = useState(0);
+  const [totalDeaths, setTotalDeaths] = useState(0);
+  const [totalInjured, setTotalInjured] = useState(0);
+  const [highestAccidentLocation, setHighestAccidentLocation] = useState("");
 
   // Function to fetch data from Flask API
   const fetchData = async () => {
@@ -32,20 +50,71 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    fetchData();
     const geojsonURL = "/bangladesh_geojson_adm2_64_districts_zillas.json";
     fetch(geojsonURL)
       .then((response) => response.json())
       .then((data) => setGeojsonData(data));
   }, []);
 
-  // useEffect to call fetchData on component mount
+  // New useEffect hook to calculate totals whenever accidentData changes
   useEffect(() => {
-    fetchData();
-  }, []); // The empty array ensures this effect runs once on mount
-  console.log("Fetching data", accidentData);
+    let accidents = 0;
+    let deaths = 0;
+    let injured = 0;
+
+    accidentData.forEach((accident) => {
+      console.log("Accident", accident);
+      accidents += 1; // Assuming each item in the array is an accident
+      deaths += parseInt(accident.total_number_of_people_killed) || 0;
+      injured += parseInt(accident.total_number_of_people_injured) || 0;
+    });
+
+    setTotalAccidents(accidents);
+    setTotalDeaths(deaths);
+    setTotalInjured(injured);
+  }, [accidentData]);
+
+  const handleViewModeChange = (event, nextView) => {
+    if (nextView !== null) {
+      setViewMode(nextView);
+    }
+  };
+
+  // New useEffect hook to calculate totals and highest accident location
+  useEffect(() => {
+    const locationFrequency = accidentData.reduce(
+      (acc, { district_of_accident }) => {
+        if (district_of_accident) {
+          acc[district_of_accident] = (acc[district_of_accident] || 0) + 1;
+        }
+        return acc;
+      },
+      {}
+    );
+
+    const highestFrequencyLocation = Object.entries(locationFrequency).sort(
+      (a, b) => b[1] - a[1]
+    )[0];
+
+    setHighestAccidentLocation(
+      highestFrequencyLocation ? highestFrequencyLocation[0] : "Not available"
+    );
+  }, [accidentData]);
+
   return (
     <Box className="container mx-auto pt-7 mb-5" style={{ maxWidth: "85%" }}>
-      <Typography variant="h4" className="mb-4">
+      <Typography
+        variant="h4"
+        className="mb-4"
+        sx={{
+          fontSize: {
+            xs: "1.88rem", // Smaller font size on extra-small devices
+            sm: "1.88rem", // Slightly larger font size on small devices
+            md: "2.125rem", // Default h4 size on medium devices and larger
+          },
+        }}
+      >
         Road Accident Dashboard
       </Typography>
       <div className="my-5">
@@ -56,39 +125,84 @@ const Dashboard = () => {
           <Grid2 xs={6} md={12} lg={6}>
             <DashboardPaper
               title="Total Accident"
-              statistic="24,532"
-              statisticNote="+14% Since last week"
+              statistic={totalAccidents.toLocaleString()}
+              // statisticNote="+14% Since last week"
             />
           </Grid2>
           <Grid2 xs={6} md={12} lg={6}>
             <DashboardPaper
-              title="Injured"
-              statistic="18,245"
-              statisticNote="+8% Since last week"
+              title="Total Deaths"
+              statistic={totalDeaths.toLocaleString()}
+              // statisticNote="+8% Since last week"
             />
           </Grid2>
           <Grid2 xs={6} md={12} lg={6}>
             <DashboardPaper
-              title="Fatal"
-              statistic="1,134"
-              statisticNote="+5% Since last week"
+              title="Total Injured"
+              statistic={totalInjured.toLocaleString()}
+              // statisticNote="+5% Since last week"
             />
           </Grid2>
           <Grid2 xs={6} md={12} lg={6}>
             <DashboardPaper
-              title="Visitors"
-              statistic="9,842"
-              statisticNote="+20% Since last week"
+              title="Highest accident location"
+              statistic={highestAccidentLocation}
+              // statisticNote="+20% Since last week"
             />
           </Grid2>
         </Grid2>
         <Grid2 xs={12} md={7}>
           <DashboardPaper>
             <Typography variant="subtitle2" className="!mb-4 !text-lg">
-              Death / Injured
+              Daily Deaths
             </Typography>
-            <Chart />
+            <LineChart accidentData={accidentData} />
           </DashboardPaper>
+        </Grid2>
+        <Grid2 xs={12} container spacing={2}>
+          <Grid2 xs={12} md={12}>
+            <DashboardPaper>
+              <Grid2
+                container
+                alignItems="center"
+                justifyContent="space-between"
+                spacing={2}
+              >
+                <Grid2 item>
+                  <Typography variant="subtitle2" className="!mb-4 !text-lg">
+                    Death / Injured
+                  </Typography>
+                </Grid2>
+                <Grid2 item>
+                  <ToggleButtonGroup
+                    size="small"
+                    color="primary"
+                    value={viewMode}
+                    exclusive
+                    onChange={handleViewModeChange}
+                    sx={{
+                      "& .MuiToggleButtonGroup-grouped": {
+                        color: "white",
+                        backgroundColor: "rgba(255,255,255,0.2)",
+                        "&.Mui-selected, &.Mui-selected:hover": {
+                          color: "white",
+                          borderColor: "white",
+                        },
+                        "&:hover": {
+                          color: "white",
+                          borderColor: "white",
+                        },
+                      },
+                    }}
+                  >
+                    <ToggleButton value="monthly">Monthly</ToggleButton>
+                    <ToggleButton value="yearly">Yearly</ToggleButton>
+                  </ToggleButtonGroup>
+                </Grid2>
+              </Grid2>
+              <Chart accidentData={accidentData} viewMode={viewMode} />
+            </DashboardPaper>
+          </Grid2>
         </Grid2>
         <Grid2 xs={12} container spacing={2}>
           <Grid2 xs={12} md={8}>
@@ -112,9 +226,9 @@ const Dashboard = () => {
           <Grid2 xs={12} md={4}>
             <DashboardPaper>
               <Typography variant="subtitle2" className="!mb-4 !text-lg">
-                Source / Medium
+                Vehicles Involved
               </Typography>
-              <SourceMediumChart />
+              <VehicleInvolvedChart accidentData={accidentData} />
             </DashboardPaper>
           </Grid2>
         </Grid2>
