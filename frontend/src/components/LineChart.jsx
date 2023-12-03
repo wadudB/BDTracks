@@ -13,7 +13,6 @@ import {
   TimeScale,
 } from "chart.js";
 import "chartjs-adapter-date-fns";
-import { subDays, format } from "date-fns";
 
 ChartJS.register(
   CategoryScale,
@@ -26,45 +25,15 @@ ChartJS.register(
   TimeScale
 );
 
-const LineChart = ({ accidentData }) => {
-  // Calculate the date 30 days ago
-  const thirtyDaysAgo = format(subDays(new Date(), 30), "yyyy-MM-dd");
-
-  // Filter data for the last 30 days
-  const filteredData = accidentData.filter(({ accident_datetime_from_url }) => {
-    const date = accident_datetime_from_url.split(" ")[0];
-    return date >= thirtyDaysAgo;
-  });
-
-  // Process data to sum deaths and injuries per day
-  const deathCounts = {};
-  const injuryCounts = {};
-  filteredData.forEach(
-    ({
-      accident_datetime_from_url,
-      total_number_of_people_killed,
-      total_number_of_people_injured,
-    }) => {
-      const date = accident_datetime_from_url.split(" ")[0];
-      deathCounts[date] =
-        (deathCounts[date] || 0) +
-        parseFloat(total_number_of_people_killed || 0);
-      injuryCounts[date] =
-        (injuryCounts[date] || 0) +
-        parseFloat(total_number_of_people_injured || 0);
-    }
-  );
-
-  const dates = Object.keys({ ...deathCounts, ...injuryCounts }).sort();
-  const deaths = dates.map((date) => deathCounts[date] || 0);
-  const injuries = dates.map((date) => injuryCounts[date] || 0);
-
+const LineChart = ({ dailyDeathsData, dailyInjuredData }) => {
+  const dates = Object.keys(dailyDeathsData);
+  const deathValues = Object.values(dailyDeathsData);
   const chartData = {
     labels: dates,
     datasets: [
       {
         label: "Total Deaths",
-        data: deaths,
+        data: deathValues,
         borderColor: "rgba(255, 99, 132, 1)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
         borderWidth: 1,
@@ -72,7 +41,7 @@ const LineChart = ({ accidentData }) => {
       },
       {
         label: "Total Injuries",
-        data: injuries,
+        data: dailyInjuredData,
         borderColor: "rgba(54, 162, 235, 1)",
         backgroundColor: "rgba(54, 162, 235, 0.5)",
         borderWidth: 2,
@@ -125,18 +94,7 @@ const LineChart = ({ accidentData }) => {
 };
 
 LineChart.propTypes = {
-  accidentData: PropTypes.arrayOf(
-    PropTypes.shape({
-      accident_datetime_from_url: PropTypes.string.isRequired,
-      total_number_of_people_killed: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.number,
-      ]),
-      total_number_of_people_injured: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.number,
-      ]),
-    })
-  ).isRequired,
+  dailyDeathsData: PropTypes.any,
+  dailyInjuredData: PropTypes.any,
 };
 export default LineChart;

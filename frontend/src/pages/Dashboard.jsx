@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import { Select, MenuItem } from "@mui/material";
 
 import "leaflet/dist/leaflet.css";
 import {
@@ -10,11 +11,6 @@ import {
   Unstable_Grid2 as Grid2,
   Divider,
 } from "@mui/material";
-// import Chart from "../components/Chart";
-// import LineChart from "../components/LineChart";
-// import VehicleInvolvedChart from "../components/VehicleInvolvedChart";
-// import LatestAccidents from "../components/LatestAccidents";
-// import DashboardPaper from "../components/DashboardPaper"; // Import the new component
 
 const Chart = React.lazy(() => import("../components/Chart"));
 const LineChart = React.lazy(() => import("../components/LineChart"));
@@ -29,12 +25,18 @@ const DashboardPaper = React.lazy(() => import("../components/DashboardPaper"));
 const Dashboard = () => {
   const [geojsonData, setGeojsonData] = useState(null);
   const [accidentData, setAccidentdata] = useState([]);
+  const [latestAccidentData, setLatestAccidentData] = useState([]);
   const [viewMode, setViewMode] = useState("monthly"); // 'monthly' or 'yearly'
   const [totalAccidents, setTotalAccidents] = useState(0);
   const [totalDeaths, setTotalDeaths] = useState(0);
   const [totalInjured, setTotalInjured] = useState(0);
   const [highestAccidentLocation, setHighestAccidentLocation] = useState("");
-
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [dailyDeaths, setDailyDeaths] = useState({});
+  const [dailyInjured, setDailyInjured] = useState({});
+  const [monthlyDeaths, setMonthlyDeaths] = useState({});
+  const [monthlyInjured, setMonthlyInjured] = useState({});
+  const [vehiclesInvolved, setVehiclesInvolved] = useState({});
   // Function to fetch data from Flask API
   const fetchData = async () => {
     try {
@@ -49,31 +51,81 @@ const Dashboard = () => {
     }
   };
 
+  // Function to fetch data from Flask API
+  const fetchLatestAccidentData = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/get_accident_reports"
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const jsonData = await response.json();
+      setLatestAccidentData(jsonData);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    fetchLatestAccidentData();
     const geojsonURL = "/bangladesh_geojson_adm2_64_districts_zillas.json";
     fetch(geojsonURL)
       .then((response) => response.json())
       .then((data) => setGeojsonData(data));
   }, []);
 
-  // New useEffect hook to calculate totals whenever accidentData changes
   useEffect(() => {
-    let accidents = 0;
-    let deaths = 0;
-    let injured = 0;
+    // Filter the data for the selected year
+    const selectedYearData = accidentData.find(
+      (item) => item.year === selectedYear
+    );
+    console.log(accidentData);
+    if (selectedYearData) {
+      console.log("Selected year: ", selectedYearData);
+      // Extract total deaths and total injuries from the selected year data
+      setTotalAccidents(selectedYearData.total_accidents);
+      setTotalDeaths(selectedYearData.total_killed);
+      setTotalInjured(selectedYearData.total_injured);
+      setHighestAccidentLocation(selectedYearData.accident_hotspot);
+      setDailyDeaths(JSON.parse(selectedYearData.daily_deaths));
+      setDailyInjured(JSON.parse(selectedYearData.daily_injured));
+      setMonthlyDeaths(JSON.parse(selectedYearData.monthly_deaths));
+      setMonthlyInjured(JSON.parse(selectedYearData.monthly_injured));
+      setVehiclesInvolved(JSON.parse(selectedYearData.vehicles_involved));
+    }
+  }, [accidentData, selectedYear]);
 
-    accidentData.forEach((accident) => {
-      console.log("Accident", accident);
-      accidents += 1; // Assuming each item in the array is an accident
-      deaths += parseInt(accident.total_number_of_people_killed) || 0;
-      injured += parseInt(accident.total_number_of_people_injured) || 0;
+  // Function to extract unique years from the response
+  const getUniqueYears = () => {
+    const years = new Set();
+    accidentData.forEach((item) => {
+      years.add(item.year);
     });
+    return Array.from(years);
+  };
 
-    setTotalAccidents(accidents);
-    setTotalDeaths(deaths);
-    setTotalInjured(injured);
-  }, [accidentData]);
+  const handleYearChange = (event) => {
+    const newYear = event.target.value;
+    setSelectedYear(newYear);
+
+    // Filter the data for the selected year
+    const selectedYearData = accidentData.find((item) => item.year === newYear);
+
+    if (selectedYearData) {
+      console.log("Selected year", selectedYearData);
+      setTotalAccidents(selectedYearData.total_accidents);
+      setTotalDeaths(selectedYearData.total_killed);
+      setTotalInjured(selectedYearData.total_injured);
+      setHighestAccidentLocation(selectedYearData.accident_hotspot);
+      setDailyDeaths(JSON.parse(selectedYearData.daily_deaths));
+      setDailyInjured(JSON.parse(selectedYearData.daily_injured));
+      setMonthlyDeaths(JSON.parse(selectedYearData.monthly_deaths));
+      setMonthlyInjured(JSON.parse(selectedYearData.monthly_injured));
+      setVehiclesInvolved(JSON.parse(selectedYearData.vehicles_involved));
+    }
+  };
 
   const handleViewModeChange = (event, nextView) => {
     if (nextView !== null) {
@@ -81,42 +133,70 @@ const Dashboard = () => {
     }
   };
 
-  // New useEffect hook to calculate totals and highest accident location
-  useEffect(() => {
-    const locationFrequency = accidentData.reduce(
-      (acc, { district_of_accident }) => {
-        if (district_of_accident) {
-          acc[district_of_accident] = (acc[district_of_accident] || 0) + 1;
-        }
-        return acc;
-      },
-      {}
-    );
-
-    const highestFrequencyLocation = Object.entries(locationFrequency).sort(
-      (a, b) => b[1] - a[1]
-    )[0];
-
-    setHighestAccidentLocation(
-      highestFrequencyLocation ? highestFrequencyLocation[0] : "Not available"
-    );
-  }, [accidentData]);
-
   return (
     <Box className="container mx-auto pt-7 mb-5" style={{ maxWidth: "85%" }}>
-      <Typography
-        variant="h4"
-        className="mb-4"
-        sx={{
-          fontSize: {
-            xs: "1.88rem", // Smaller font size on extra-small devices
-            sm: "1.88rem", // Slightly larger font size on small devices
-            md: "2.125rem", // Default h4 size on medium devices and larger
-          },
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        Road Accident Dashboard
-      </Typography>
+        <Typography
+          variant="h4"
+          className="mb-4"
+          sx={{
+            fontSize: {
+              xs: "1.88rem",
+              sm: "1.88rem",
+              md: "2.125rem",
+            },
+          }}
+        >
+          Road Accident Dashboard
+        </Typography>
+        <Select
+          value={selectedYear}
+          onChange={handleYearChange}
+          style={{
+            marginLeft: 20,
+            width: 120,
+            color: "white",
+            textAlign: "center",
+            borderColor: "white",
+            borderWidth: "1px",
+          }}
+          MenuProps={{
+            PaperProps: {
+              style: {
+                backgroundColor: "#202940",
+                color: "white",
+              },
+            },
+            sx: {
+              ".MuiMenuItem-root": {
+                justifyContent: "center",
+              },
+            },
+          }}
+          inputProps={{
+            sx: {
+              backgroundColor: "#202940",
+              borderStyle: "solid",
+            },
+          }}
+        >
+          {getUniqueYears().map((year) => (
+            <MenuItem
+              key={year}
+              value={year}
+              style={{ justifyContent: "center" }}
+            >
+              {year}
+            </MenuItem>
+          ))}
+        </Select>
+      </div>
       <div className="my-5">
         <Divider variant="fullwidth" sx={{ borderColor: "#ffffff" }} />
       </div>
@@ -156,7 +236,10 @@ const Dashboard = () => {
             <Typography variant="subtitle2" className="!mb-4 !text-lg">
               Daily Deaths
             </Typography>
-            <LineChart accidentData={accidentData} />
+            <LineChart
+              dailyDeathsData={dailyDeaths}
+              dailyInjuredData={dailyInjured}
+            />
           </DashboardPaper>
         </Grid2>
         <Grid2 xs={12} container spacing={2}>
@@ -168,12 +251,12 @@ const Dashboard = () => {
                 justifyContent="space-between"
                 spacing={2}
               >
-                <Grid2 item>
+                <Grid2 item="true">
                   <Typography variant="subtitle2" className="!mb-4 !text-lg">
                     Death / Injured
                   </Typography>
                 </Grid2>
-                <Grid2 item>
+                <Grid2 item="true">
                   <ToggleButtonGroup
                     size="small"
                     color="primary"
@@ -200,7 +283,12 @@ const Dashboard = () => {
                   </ToggleButtonGroup>
                 </Grid2>
               </Grid2>
-              <Chart accidentData={accidentData} viewMode={viewMode} />
+              <Chart
+                monthlyInjured={monthlyInjured}
+                monthlyDeaths={monthlyDeaths}
+                accidentData={accidentData}
+                viewMode={viewMode}
+              />
             </DashboardPaper>
           </Grid2>
         </Grid2>
@@ -228,7 +316,7 @@ const Dashboard = () => {
               <Typography variant="subtitle2" className="!mb-4 !text-lg">
                 Vehicles Involved
               </Typography>
-              <VehicleInvolvedChart accidentData={accidentData} />
+              <VehicleInvolvedChart vehiclesInvolved={vehiclesInvolved} />
             </DashboardPaper>
           </Grid2>
         </Grid2>
@@ -238,7 +326,7 @@ const Dashboard = () => {
               <Typography variant="subtitle2" className="!text-lg">
                 Recent Accident Reports
               </Typography>
-              <LatestAccidents accidentData={accidentData} />
+              <LatestAccidents latestAccidentData={latestAccidentData} />
             </DashboardPaper>
           </Grid2>
         </Grid2>

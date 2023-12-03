@@ -16,39 +16,18 @@ const useWindowSize = () => {
   return size;
 };
 
-const VehicleInvolvedChart = ({ accidentData }) => {
+const VehicleInvolvedChart = ({ vehiclesInvolved }) => {
   const [width] = useWindowSize();
 
   const vehicleData = useMemo(() => {
-    const vehicleCounts = {};
-
-    accidentData.forEach(
-      ({
-        primary_vehicle_involved,
-        secondary_vehicle_involved,
-        tertiary_vehicle_involved,
-      }) => {
-        [
-          primary_vehicle_involved,
-          secondary_vehicle_involved,
-          tertiary_vehicle_involved,
-        ].forEach((vehicle) => {
-          if (vehicle) {
-            vehicleCounts[vehicle] = (vehicleCounts[vehicle] || 0) + 1;
-          }
-        });
-      }
-    );
-
-    const sortedVehicleData = Object.entries(vehicleCounts).sort(
-      (a, b) => b[1] - a[1]
-    );
+    const vehicleName = Object.keys(vehiclesInvolved);
+    const vehicleCount = Object.values(vehiclesInvolved);
 
     return {
-      labels: sortedVehicleData.map(([vehicle]) => vehicle),
+      labels: vehicleName,
       datasets: [
         {
-          data: sortedVehicleData.map(([, count]) => count),
+          data: vehicleCount,
           backgroundColor: [
             "rgba(255, 99, 132, 0.5)",
             "rgba(54, 162, 235, 0.5)",
@@ -68,7 +47,7 @@ const VehicleInvolvedChart = ({ accidentData }) => {
         },
       ],
     };
-  }, [accidentData]);
+  }, [vehiclesInvolved]);
 
   const options = useMemo(
     () => ({
@@ -109,13 +88,7 @@ const VehicleInvolvedChart = ({ accidentData }) => {
 };
 
 VehicleInvolvedChart.propTypes = {
-  accidentData: PropTypes.arrayOf(
-    PropTypes.shape({
-      primary_vehicle_involved: PropTypes.string,
-      secondary_vehicle_involved: PropTypes.string,
-      tertiary_vehicle_involved: PropTypes.string,
-    })
-  ).isRequired,
+  vehiclesInvolved: PropTypes.objectOf,
 };
 
 export default VehicleInvolvedChart;

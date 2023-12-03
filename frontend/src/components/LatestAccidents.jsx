@@ -9,10 +9,32 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types";
 
-const LatestAccidents = ({ accidentData }) => {
+const LatestAccidents = ({ latestAccidentData }) => {
   const cellStyle = { color: "white" };
 
-  const latestAccidents = accidentData.slice(0, 7);
+  // const latestAccidents = accidentData.slice(0, 7);
+
+  // Utc timestamp
+  // const formatLocalDateTime = (datetime) => {
+  //   if (!datetime) return "Not Available";
+
+  //   // Parse the datetime
+  //   // Format: 'YYYY-MM-DD HH:mm:ss'
+  //   const [datePart, timePart] = datetime.split(" ");
+  //   const [year, month, day] = datePart.split("-").map(Number);
+  //   const [hours, minutes, seconds] = timePart.split(":").map(Number);
+
+  //   // Create a Date object in UTC+6
+  //   const date = new Date(
+  //     Date.UTC(year, month - 1, day, hours - 6, minutes, seconds)
+  //   );
+
+  //   // Check if the date is valid
+  //   if (isNaN(date.getTime())) return "Invalid Date";
+
+  //   // Format the date in the local timezone
+  //   return date.toLocaleString();
+  // };
 
   return (
     <TableContainer
@@ -42,7 +64,7 @@ const LatestAccidents = ({ accidentData }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {latestAccidents.map((row, index) => (
+          {latestAccidentData.map((row, index) => (
             <TableRow key={index}>
               <TableCell sx={cellStyle} component="th" scope="row">
                 {row.accident_datetime_from_url || "Not Available"}
@@ -72,14 +94,14 @@ const LatestAccidents = ({ accidentData }) => {
   );
 };
 LatestAccidents.propTypes = {
-  accidentData: PropTypes.arrayOf(
+  latestAccidentData: PropTypes.arrayOf(
     PropTypes.shape({
-      accident_datetime_from_url: PropTypes.string.isRequired,
-      total_number_of_people_injured: PropTypes.string.isRequired,
-      total_number_of_people_killed: PropTypes.string.isRequired,
-      exact_location_of_accident: PropTypes.string.isRequired,
-      district_of_accident: PropTypes.string.isRequired,
-      accident_type: PropTypes.string.isRequired,
+      accident_datetime_from_url: PropTypes.string,
+      total_number_of_people_injured: PropTypes.string,
+      total_number_of_people_killed: PropTypes.string,
+      exact_location_of_accident: PropTypes.string,
+      district_of_accident: PropTypes.string,
+      accident_type: PropTypes.string,
     })
   ).isRequired,
 };

@@ -11,7 +11,6 @@ import {
   Legend,
 } from "chart.js";
 import "chartjs-adapter-date-fns";
-import { parseISO, format } from "date-fns";
 
 ChartJS.register(
   CategoryScale,
@@ -22,45 +21,28 @@ ChartJS.register(
   Legend
 );
 
-const Chart = ({ accidentData, viewMode }) => {
+const Chart = ({ monthlyInjured, monthlyDeaths, accidentData, viewMode }) => {
   const chartData = useMemo(() => {
-    const aggregateData = {};
-    const monthOrder = {
-      Jan: 1,
-      Feb: 2,
-      Mar: 3,
-      Apr: 4,
-      May: 5,
-      Jun: 6,
-      Jul: 7,
-      Aug: 8,
-      Sep: 9,
-      Oct: 10,
-      Nov: 11,
-      Dec: 12,
-    };
+    let labels, deathData, injuredData;
 
-    accidentData.forEach((item) => {
-      const date = parseISO(item.accident_datetime_from_url);
-      const key =
-        viewMode === "yearly" ? format(date, "yyyy") : format(date, "MMM");
+    if (viewMode === "yearly") {
+      // Yearly data logic
+      const yearlyData = accidentData.map((data) => ({
+        year: data.year,
+        totalKilled: data.total_killed,
+        totalInjured: data.total_injured,
+      }));
+      labels = yearlyData.map((data) => data.year.toString());
+      deathData = yearlyData.map((data) => data.totalKilled);
+      injuredData = yearlyData.map((data) => data.totalInjured);
+    } else {
+      // Monthly data logic
+      labels = Object.keys(monthlyDeaths).sort();
+      deathData = Object.values(monthlyDeaths);
+      injuredData = Object.values(monthlyInjured);
+    }
 
-      if (!aggregateData[key]) {
-        aggregateData[key] = { Death: 0, Injured: 0 };
-      }
-
-      aggregateData[key].Death +=
-        parseInt(item.total_number_of_people_killed, 10) || 0;
-      aggregateData[key].Injured +=
-        parseInt(item.total_number_of_people_injured, 10) || 0;
-    });
-
-    const labels = Object.keys(aggregateData).sort(
-      (a, b) => monthOrder[a] - monthOrder[b]
-    );
-    const deathData = labels.map((key) => aggregateData[key].Death);
-    const injuredData = labels.map((key) => aggregateData[key].Injured);
-
+    // Common dataset configuration
     return {
       labels,
       datasets: [
@@ -80,7 +62,7 @@ const Chart = ({ accidentData, viewMode }) => {
         },
       ],
     };
-  }, [accidentData, viewMode]);
+  }, [monthlyInjured, monthlyDeaths, accidentData, viewMode]);
 
   const options = {
     scales: {
@@ -100,17 +82,13 @@ const Chart = ({ accidentData, viewMode }) => {
 };
 
 Chart.propTypes = {
+  monthlyInjured: PropTypes.object.isRequired,
+  monthlyDeaths: PropTypes.object.isRequired,
   accidentData: PropTypes.arrayOf(
     PropTypes.shape({
-      accident_datetime_from_url: PropTypes.string.isRequired,
-      total_number_of_people_killed: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.number,
-      ]),
-      total_number_of_people_injured: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.number,
-      ]),
+      year: PropTypes.number.isRequired,
+      total_killed: PropTypes.number.isRequired,
+      total_injured: PropTypes.number.isRequired,
     })
   ).isRequired,
   viewMode: PropTypes.oneOf(["monthly", "yearly"]).isRequired,
