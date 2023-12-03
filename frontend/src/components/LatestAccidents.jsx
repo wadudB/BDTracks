@@ -12,6 +12,14 @@ import PropTypes from "prop-types";
 const LatestAccidents = ({ latestAccidentData }) => {
   const cellStyle = { color: "white" };
 
+  function removeGMT(datetimeStr) {
+    // Assuming the format is something like '2023-03-28 12:00:00 GMT'
+    if (datetimeStr.endsWith(" GMT")) {
+      return datetimeStr.slice(0, -4); // Remove the last 4 characters
+    }
+    return datetimeStr;
+  }
+
   // const latestAccidents = accidentData.slice(0, 7);
 
   // Utc timestamp
@@ -45,7 +53,7 @@ const LatestAccidents = ({ latestAccidentData }) => {
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell sx={cellStyle}>Date Time</TableCell>
+            <TableCell sx={cellStyle}>Date Time (BDT)</TableCell>
             <TableCell sx={cellStyle} align="right">
               Injured
             </TableCell>
@@ -67,7 +75,7 @@ const LatestAccidents = ({ latestAccidentData }) => {
           {latestAccidentData.map((row, index) => (
             <TableRow key={index}>
               <TableCell sx={cellStyle} component="th" scope="row">
-                {row.accident_datetime_from_url || "Not Available"}
+                {removeGMT(row.accident_datetime_from_url) || "Not Available"}
               </TableCell>
               <TableCell sx={cellStyle} align="right">
                 {Math.floor(row.total_number_of_people_injured) ||

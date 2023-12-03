@@ -20,8 +20,10 @@ const VehicleInvolvedChart = ({ vehiclesInvolved }) => {
   const [width] = useWindowSize();
 
   const vehicleData = useMemo(() => {
-    const vehicleName = Object.keys(vehiclesInvolved);
-    const vehicleCount = Object.values(vehiclesInvolved);
+    const vehicleEntries = Object.entries(vehiclesInvolved);
+    vehicleEntries.sort((a, b) => b[1] - a[1]);
+    const vehicleName = vehicleEntries.map((entry) => entry[0]);
+    const vehicleCount = vehicleEntries.map((entry) => entry[1]);
 
     return {
       labels: vehicleName,
@@ -88,7 +90,7 @@ const VehicleInvolvedChart = ({ vehiclesInvolved }) => {
 };
 
 VehicleInvolvedChart.propTypes = {
-  vehiclesInvolved: PropTypes.objectOf,
+  vehiclesInvolved: PropTypes.objectOf(PropTypes.number),
 };
 
 export default VehicleInvolvedChart;
