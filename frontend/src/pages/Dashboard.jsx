@@ -3,7 +3,6 @@ import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { Select, MenuItem } from "@mui/material";
-
 import "leaflet/dist/leaflet.css";
 import {
   Typography,
@@ -14,13 +13,13 @@ import {
 
 const Chart = React.lazy(() => import("../components/Chart"));
 const LineChart = React.lazy(() => import("../components/LineChart"));
+const DashboardPaper = React.lazy(() => import("../components/DashboardPaper"));
 const VehicleInvolvedChart = React.lazy(() =>
   import("../components/VehicleInvolvedChart")
 );
 const LatestAccidents = React.lazy(() =>
   import("../components/LatestAccidents")
 );
-const DashboardPaper = React.lazy(() => import("../components/DashboardPaper"));
 
 const Dashboard = () => {
   const [geojsonData, setGeojsonData] = useState(null);
@@ -41,6 +40,7 @@ const Dashboard = () => {
   const fetchData = async () => {
     try {
       const response = await fetch("http://localhost:5000/data");
+      // const response = await fetch("https://bdtracks.com/api/data");
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -56,6 +56,7 @@ const Dashboard = () => {
     try {
       const response = await fetch(
         "http://localhost:5000/get_accident_reports"
+        // "https://bdtracks.com/api/get_accident_reports"
       );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -81,9 +82,9 @@ const Dashboard = () => {
     const selectedYearData = accidentData.find(
       (item) => item.year === selectedYear
     );
-    console.log(accidentData);
+    // console.log(accidentData);
     if (selectedYearData) {
-      console.log("Selected year: ", selectedYearData);
+      // console.log("Selected year: ", selectedYearData);
       // Extract total deaths and total injuries from the selected year data
       setTotalAccidents(selectedYearData.total_accidents);
       setTotalDeaths(selectedYearData.total_killed);
@@ -155,47 +156,72 @@ const Dashboard = () => {
         >
           Road Accident Dashboard
         </Typography>
-        <Select
-          value={selectedYear}
-          onChange={handleYearChange}
-          style={{
-            marginLeft: 20,
-            width: 120,
-            color: "white",
-            textAlign: "center",
-            borderColor: "white",
-            borderWidth: "1px",
-          }}
-          MenuProps={{
-            PaperProps: {
-              style: {
-                backgroundColor: "#202940",
-                color: "white",
+
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Typography
+            variant="body1"
+            style={{
+              marginRight: "10px",
+              color: "white",
+            }}
+          >
+            Last updated:{" "}
+            {new Date(latestAccidentData[0]?.accident_datetime_from_url)
+              .toLocaleString("en-US")
+              .replace(" GMT", "")}
+          </Typography>
+          <Select
+            value={selectedYear}
+            onChange={handleYearChange}
+            sx={{
+              marginLeft: 2,
+              width: 100,
+              color: "white",
+              textAlign: "right",
+              borderColor: "white",
+              borderWidth: 0.1,
+              fontSize: {
+                xs: "0.875rem", // smaller font size on extra-small screens
+                sm: "1rem", // default font size on small screens and up
               },
-            },
-            sx: {
-              ".MuiMenuItem-root": {
-                justifyContent: "center",
-              },
-            },
-          }}
-          inputProps={{
-            sx: {
               backgroundColor: "#202940",
               borderStyle: "solid",
-            },
-          }}
-        >
-          {getUniqueYears().map((year) => (
-            <MenuItem
-              key={year}
-              value={year}
-              style={{ justifyContent: "center" }}
-            >
-              {year}
-            </MenuItem>
-          ))}
-        </Select>
+              "& .MuiSelect-select": {
+                // Style for the select input
+                padding: "6px",
+              },
+              "& .MuiSvgIcon-root": {
+                // Style for the dropdown icon
+                color: "white",
+                fontSize: "1.25rem",
+              },
+            }}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  backgroundColor: "#202940",
+                  color: "white",
+                },
+              },
+              sx: {
+                ".MuiMenuItem-root": {
+                  justifyContent: "center",
+                },
+              },
+            }}
+          >
+            {/* Menu items */}
+            {getUniqueYears().map((year) => (
+              <MenuItem
+                key={year}
+                value={year}
+                style={{ justifyContent: "center" }}
+              >
+                {year}
+              </MenuItem>
+            ))}
+          </Select>
+        </div>
       </div>
       <div className="my-5">
         <Divider variant="fullwidth" sx={{ borderColor: "#ffffff" }} />
@@ -204,7 +230,7 @@ const Dashboard = () => {
         <Grid2 xs={12} md={5} container spacing={2}>
           <Grid2 xs={6} md={12} lg={6}>
             <DashboardPaper
-              title="Total Accident"
+              title="Total Accidents"
               statistic={totalAccidents.toLocaleString()}
               // statisticNote="+14% Since last week"
             />

@@ -1,6 +1,9 @@
 import { useMemo, useState, useEffect } from "react";
 import { Bar } from "react-chartjs-2";
 import PropTypes from "prop-types";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 // Custom hook to listen to window resize events
 const useWindowSize = () => {
@@ -16,8 +19,11 @@ const useWindowSize = () => {
   return size;
 };
 
-const VehicleInvolvedChart = ({ vehiclesInvolved }) => {
+const VehicleInvolvedChart = ({ vehiclesInvolved, slideIndex }) => {
   const [width] = useWindowSize();
+  const rowsPerSlide = 15;
+  const startRow = slideIndex * rowsPerSlide;
+  const endRow = startRow + rowsPerSlide;
 
   const vehicleData = useMemo(() => {
     const vehicleEntries = Object.entries(vehiclesInvolved);
@@ -25,11 +31,16 @@ const VehicleInvolvedChart = ({ vehiclesInvolved }) => {
     const vehicleName = vehicleEntries.map((entry) => entry[0]);
     const vehicleCount = vehicleEntries.map((entry) => entry[1]);
 
+    // Slice the data to show only 'rowsToShow' number of rows
+    // Slice the data based on the slide index
+    const slicedVehicleName = vehicleName.slice(startRow, endRow);
+    const slicedVehicleCount = vehicleCount.slice(startRow, endRow);
+
     return {
-      labels: vehicleName,
+      labels: slicedVehicleName,
       datasets: [
         {
-          data: vehicleCount,
+          data: slicedVehicleCount,
           backgroundColor: [
             "rgba(255, 99, 132, 0.5)",
             "rgba(54, 162, 235, 0.5)",
@@ -49,7 +60,7 @@ const VehicleInvolvedChart = ({ vehiclesInvolved }) => {
         },
       ],
     };
-  }, [vehiclesInvolved]);
+  }, [vehiclesInvolved, startRow, endRow]); // Add dependencies here
 
   const options = useMemo(
     () => ({
@@ -91,6 +102,43 @@ const VehicleInvolvedChart = ({ vehiclesInvolved }) => {
 
 VehicleInvolvedChart.propTypes = {
   vehiclesInvolved: PropTypes.objectOf(PropTypes.number),
+  slideIndex: PropTypes.number, // Add propType for slideIndex
 };
 
-export default VehicleInvolvedChart;
+// Carousel component that displays 10 rows of the chart per slide
+const ChartCarousel = ({ vehiclesInvolved }) => {
+  const totalRows = Object.keys(vehiclesInvolved).length;
+  const numSlides = Math.ceil(totalRows / 15);
+
+  const sliderSettings = {
+    dots: true, // Enable bottom dots
+    arrows: false, // Disable left and right arrows
+    infinite: false,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    appendDots: (dots) => (
+      <div style={{ bottom: "-6px", fill: "white !important" }}>{dots}</div>
+    ),
+  };
+
+  return (
+    <Slider {...sliderSettings}>
+      {Array.from({ length: numSlides }).map((_, index) => (
+        <div key={index}>
+          <VehicleInvolvedChart
+            vehiclesInvolved={vehiclesInvolved}
+            slideIndex={index} // Pass the slide index here
+            rowsToShow={10}
+          />
+        </div>
+      ))}
+    </Slider>
+  );
+};
+
+ChartCarousel.propTypes = {
+  vehiclesInvolved: PropTypes.objectOf(PropTypes.number),
+};
+
+export default ChartCarousel;
