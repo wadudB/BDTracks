@@ -19,7 +19,7 @@ def get_data():
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
 
-    # Your specific SQL query
+    # SQL query
     query = """
     SELECT * FROM `accident_summary_2023`;
     """
@@ -39,7 +39,7 @@ def get_accident_reports():
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
 
-    # Your specific SQL query
+    # SQL query
     query = """
     SELECT 
         `accident_datetime_from_url`, 
@@ -60,6 +60,26 @@ def get_accident_reports():
     cursor.close()
     conn.close()
     # print((rows))
+    return jsonify(rows)
+
+
+@app.route("/commodity-data", methods=["GET"])
+def commodity_data():
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+
+    # SQL query
+    query = """
+    SELECT * FROM `commodities`;
+    """
+
+    # LIMIT 2000;
+    cursor.execute(query)
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+    print((rows))
     return jsonify(rows)
 
 

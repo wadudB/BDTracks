@@ -3,6 +3,8 @@ import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { Select, MenuItem } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import "leaflet/dist/leaflet.css";
 import {
   Typography,
@@ -36,6 +38,8 @@ const Dashboard = () => {
   const [monthlyDeaths, setMonthlyDeaths] = useState({});
   const [monthlyInjured, setMonthlyInjured] = useState({});
   const [vehiclesInvolved, setVehiclesInvolved] = useState({});
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   // Function to fetch data from Flask API
   const fetchData = async () => {
     try {
@@ -115,7 +119,7 @@ const Dashboard = () => {
     const selectedYearData = accidentData.find((item) => item.year === newYear);
 
     if (selectedYearData) {
-      console.log("Selected year", selectedYearData);
+      // console.log("Selected year", selectedYearData);
       setTotalAccidents(selectedYearData.total_accidents);
       setTotalDeaths(selectedYearData.total_killed);
       setTotalInjured(selectedYearData.total_injured);
@@ -135,12 +139,15 @@ const Dashboard = () => {
   };
 
   return (
-    <Box className="container mx-auto pt-7 mb-5" style={{ maxWidth: "85%" }}>
+    <Box
+      className="container mx-auto pt-7 mb-5"
+      style={{ maxWidth: isSmallScreen ? "88%" : "85%" }}
+    >
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: "right",
         }}
       >
         <Typography
@@ -156,72 +163,55 @@ const Dashboard = () => {
         >
           Road Accident Dashboard
         </Typography>
-
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <Typography
-            variant="body1"
-            style={{
-              marginRight: "10px",
+        <Select
+          value={selectedYear}
+          onChange={handleYearChange}
+          sx={{
+            marginLeft: 2,
+            width: 100,
+            color: "white",
+            textAlign: "right",
+            borderColor: "white",
+            borderWidth: 0.1,
+            fontSize: {
+              xs: "0.875rem", // smaller font size on extra-small screens
+              sm: "1rem", // default font size on small screens and up
+            },
+            backgroundColor: "#202940",
+            borderStyle: "solid",
+            "& .MuiSelect-select": {
+              padding: "6px",
+            },
+            "& .MuiSvgIcon-root": {
               color: "white",
-            }}
-          >
-            Last updated:{" "}
-            {new Date(latestAccidentData[0]?.accident_datetime_from_url)
-              .toLocaleString("en-US")
-              .replace(" GMT", "")}
-          </Typography>
-          <Select
-            value={selectedYear}
-            onChange={handleYearChange}
-            sx={{
-              marginLeft: 2,
-              width: 100,
-              color: "white",
-              textAlign: "right",
-              borderColor: "white",
-              borderWidth: 0.1,
-              fontSize: {
-                xs: "0.875rem", // smaller font size on extra-small screens
-                sm: "1rem", // default font size on small screens and up
-              },
-              backgroundColor: "#202940",
-              borderStyle: "solid",
-              "& .MuiSelect-select": {
-                // Style for the select input
-                padding: "6px",
-              },
-              "& .MuiSvgIcon-root": {
-                // Style for the dropdown icon
+              fontSize: "1.25rem",
+            },
+          }}
+          MenuProps={{
+            PaperProps: {
+              style: {
+                backgroundColor: "#202940",
                 color: "white",
-                fontSize: "1.25rem",
               },
-            }}
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  backgroundColor: "#202940",
-                  color: "white",
-                },
+            },
+            sx: {
+              ".MuiMenuItem-root": {
+                justifyContent: "center",
               },
-              sx: {
-                ".MuiMenuItem-root": {
-                  justifyContent: "center",
-                },
-              },
-            }}
-          >
-            {/* Menu items */}
-            {getUniqueYears().map((year) => (
-              <MenuItem
-                key={year}
-                value={year}
-                style={{ justifyContent: "center" }}
-              >
-                {year}
-              </MenuItem>
-            ))}
-          </Select>
-        </div>
+            },
+          }}
+        >
+          {/* Menu items */}
+          {getUniqueYears().map((year) => (
+            <MenuItem
+              key={year}
+              value={year}
+              style={{ justifyContent: "center" }}
+            >
+              {year}
+            </MenuItem>
+          ))}
+        </Select>
       </div>
       <div className="my-5">
         <Divider variant="fullwidth" sx={{ borderColor: "#ffffff" }} />
