@@ -10,6 +10,7 @@ import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import { useState } from "react";
+import { styled } from "@mui/material/styles";
 
 const Navbar = () => {
   const theme = useTheme();
@@ -45,12 +46,14 @@ const Navbar = () => {
     },
   };
 
-  const linkStyle = {
+  const StyledLink = styled(Link)({
     marginRight: "20px",
     textDecoration: "none",
     color: "white",
-    fontWeight: "bold",
-  };
+    "&:hover": {
+      color: "#c77676",
+    },
+  });
 
   const titleStyle = {
     position: "absolute",
@@ -58,7 +61,6 @@ const Navbar = () => {
     transform: "translateX(-50%)",
     color: "white",
     textDecoration: "none",
-    fontWeight: "bold",
     py: 1.5,
   };
 
@@ -71,9 +73,9 @@ const Navbar = () => {
       <List>
         {["Road Accident Dashboard", "Commodities"].map((text, index) => (
           <ListItem button key={text}>
-            <Link to={index % 2 === 0 ? "/" : "/commodities"} style={linkStyle}>
+            <StyledLink to={index % 2 === 0 ? "/" : "/commodities"}>
               {text}
-            </Link>
+            </StyledLink>
           </ListItem>
         ))}
       </List>
@@ -98,12 +100,8 @@ const Navbar = () => {
             </IconButton>
           ) : (
             <div>
-              <Link to="/" style={linkStyle}>
-                Road Accident Dashboard
-              </Link>
-              <Link to="/commodities" style={linkStyle}>
-                Commodities
-              </Link>
+              <StyledLink to="/">Road Accident Dashboard</StyledLink>
+              <StyledLink to="/commodities">Commodities</StyledLink>
             </div>
           )}
         </Toolbar>

@@ -119,7 +119,7 @@ const Dashboard = () => {
     const selectedYearData = accidentData.find((item) => item.year === newYear);
 
     if (selectedYearData) {
-      console.log("Selected year", selectedYearData);
+      // console.log("Selected year", selectedYearData);
       setTotalAccidents(selectedYearData.total_accidents);
       setTotalDeaths(selectedYearData.total_killed);
       setTotalInjured(selectedYearData.total_injured);
@@ -189,6 +189,9 @@ const Dashboard = () => {
                 color: "white",
                 fontSize: "1.25rem",
               },
+              "&:hover": {
+                color: "#c77676",
+              },
             }}
             MenuProps={{
               PaperProps: {
@@ -200,6 +203,9 @@ const Dashboard = () => {
               sx: {
                 ".MuiMenuItem-root": {
                   justifyContent: "center",
+                  "&:hover": {
+                    color: "#c77676",
+                  },
                 },
               },
             }}
@@ -292,7 +298,7 @@ const Dashboard = () => {
                           borderColor: "white",
                         },
                         "&:hover": {
-                          color: "white",
+                          color: "#c77676",
                           borderColor: "white",
                         },
                       },
