@@ -180,7 +180,7 @@ const Commodities = () => {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "right",
+          alignItems: "center",
         }}
       >
         <Typography

@@ -34,7 +34,6 @@ const Navbar = () => {
     mx: "auto",
     mt: 2,
     maxWidth: isSmallScreen ? "88%" : "85%",
-    px: 2,
     borderRadius: "8px",
   };
 
