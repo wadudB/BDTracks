@@ -132,5 +132,32 @@ def add_commodity():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/election_data", methods=["GET"])
+def election_data():
+    try:
+        conn = mysql.connector.connect(**db_config)
+        if conn.is_connected():
+            cursor = conn.cursor(dictionary=True)
+
+            # SQL query
+            query = """
+            SELECT * FROM `2024_bangladesh_election`;
+            """
+
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            return jsonify(rows)
+        else:
+            return jsonify({"error": "Database connection failed"}), 500
+    except Error as e:
+        current_app.logger.error(f"Database error: {e}")
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if "cursor" in locals():
+            cursor.close()
+        if "conn" in locals() and conn.is_connected():
+            conn.close()
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

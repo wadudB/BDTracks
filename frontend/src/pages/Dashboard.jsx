@@ -43,8 +43,8 @@ const Dashboard = () => {
   // Function to fetch data from Flask API
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:5000/data");
-      // const response = await fetch("https://bdtracks.com/api/data");
+      const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+      const response = await fetch(`${apiUrl}/data`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -58,10 +58,8 @@ const Dashboard = () => {
   // Function to fetch data from Flask API
   const fetchLatestAccidentData = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:5000/get_accident_reports"
-        // "https://bdtracks.com/api/get_accident_reports"
-      );
+      const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+      const response = await fetch(`${apiUrl}/get_accident_reports`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

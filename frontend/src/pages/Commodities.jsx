@@ -71,7 +71,8 @@ const Commodities = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/add-commodity", {
+      const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+      const response = await fetch(`${apiUrl}/add-commodity`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -85,7 +86,6 @@ const Commodities = () => {
         throw new Error(responseData.message || "Failed to add commodity");
       }
 
-      // Handle response here. For example, show a success message.
       setSnackbarInfo({
         open: true,
         message: "Commodity added successfully!",
@@ -111,7 +111,8 @@ const Commodities = () => {
     // Asynchronous function to fetch commodity data
     const fetchCommodityData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/commodity-data");
+        const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+        const response = await fetch(`${apiUrl}/commodity-data`);
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }

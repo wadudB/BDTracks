@@ -70,13 +70,23 @@ const Navbar = () => {
       onKeyDown={toggleDrawer(false)}
     >
       <List>
-        {["Road Accident Dashboard", "Commodities"].map((text, index) => (
-          <ListItem button key={text}>
-            <StyledLink to={index % 2 === 0 ? "/" : "/commodities"}>
-              {text}
-            </StyledLink>
-          </ListItem>
-        ))}
+        {["Road Accident Dashboard", "Commodities", "Constituencies"].map(
+          (text, index) => (
+            <ListItem button key={text}>
+              <StyledLink
+                to={
+                  index === 0
+                    ? "/"
+                    : index === 1
+                    ? "/commodities"
+                    : "/constituencies_poll"
+                }
+              >
+                {text}
+              </StyledLink>
+            </ListItem>
+          )
+        )}
       </List>
     </div>
   );
@@ -101,6 +111,7 @@ const Navbar = () => {
             <div>
               <StyledLink to="/">Road Accident Dashboard</StyledLink>
               <StyledLink to="/commodities">Commodities</StyledLink>
+              <StyledLink to="/constituencies_poll">Constituencies</StyledLink>
             </div>
           )}
         </Toolbar>
