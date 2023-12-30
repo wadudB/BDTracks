@@ -45,16 +45,16 @@ const CustomButton = styled(Button)(({ theme }) => ({
 // Table component for displaying candidate details
 const CandidateDetailsTable = ({ data }) => {
   const [selectedCandidates, setSelectedCandidates] = useState({});
-  const handleCheck = (candidate) => {
+  const handleCheck = (candidateName) => {
     setSelectedCandidates((prev) => ({
       ...prev,
-      [candidate]: !prev[candidate],
+      [candidateName]: !prev[candidateName],
     }));
   };
 
-  const handleVote = (candidate) => {
+  const handleVote = (candidateName) => {
     // Implement vote logic here
-    alert(`Vote recorded for ${candidate}`);
+    alert(`Vote recorded for ${candidateName}`);
   };
 
   return (
@@ -85,7 +85,7 @@ const CandidateDetailsTable = ({ data }) => {
           {data.map((row, index) => (
             <TableRow key={index}>
               <TableCell component="th" scope="row" style={{ color: "white" }}>
-                {row.Candidate}
+                {row.CandidateName}
               </TableCell>
               <TableCell style={{ color: "white" }} align="right">
                 {row.Party}
@@ -93,19 +93,20 @@ const CandidateDetailsTable = ({ data }) => {
               <TableCell style={{ color: "white" }} align="right">
                 <Checkbox
                   sx={{ color: "white" }}
-                  checked={!!selectedCandidates[row.Candidate]}
-                  onChange={() => handleCheck(row.Candidate)}
-                  disabled={row.Candidate === "Nomination Withdrawn"} // Disable checkbox if status is "Nomination Withdrawn"
+                  checked={!!selectedCandidates[row.CandidateName]}
+                  onChange={() => handleCheck(row.CandidateName)}
+                  // Assuming Nomination Withdrawn is a status you can check in your data
+                  disabled={row.CandidateName === "Nomination Withdrawn"}
                 />
               </TableCell>
               <TableCell style={{ color: "white" }} align="right">
                 <CustomButton
                   variant="contained"
                   color="primary"
-                  onClick={() => handleVote(row.Candidate)}
+                  onClick={() => handleVote(row.CandidateName)}
                   disabled={
-                    !selectedCandidates[row.Candidate] ||
-                    row.Candidate === "Nomination Withdrawn"
+                    !selectedCandidates[row.CandidateName] ||
+                    row.CandidateName === "Nomination Withdrawn"
                   }
                 >
                   Vote
@@ -121,8 +122,10 @@ const CandidateDetailsTable = ({ data }) => {
 CandidateDetailsTable.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
-      Candidate: PropTypes.string.isRequired,
+      CandidateName: PropTypes.string.isRequired,
       Party: PropTypes.string.isRequired,
+      Votes: PropTypes.number,
+      // Add other properties as necessary
     })
   ).isRequired,
 };
@@ -210,25 +213,11 @@ const Constituencies = () => {
 
   // Find election data for the current feature
   const getElectionDataForFeature = (featureCst) => {
-    const constituencyData = electionData.find(
-      (data) => data.cst === featureCst
+    // Assuming electionData is an array of candidates
+    const constituencyCandidates = electionData.filter(
+      (data) => data.ConstituencyID === featureCst
     );
-    if (!constituencyData) return [];
-
-    const candidates = [];
-    for (let i = 1; i <= 3; i++) {
-      // up to 3 candidates per constituency
-      const candidateKey = `Candidate${i === 1 ? "" : i}`;
-      const partyKey = `Party${i === 1 ? "" : i}`;
-      if (constituencyData[candidateKey]) {
-        candidates.push({
-          Candidate: constituencyData[candidateKey],
-          Party: constituencyData[partyKey],
-        });
-      }
-    }
-
-    return candidates;
+    return constituencyCandidates;
   };
   if (error)
     return (
