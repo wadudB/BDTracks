@@ -24,6 +24,25 @@ import PropTypes from "prop-types";
 import { Checkbox, Button } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 const DashboardPaper = React.lazy(() => import("../components/DashboardPaper"));
 
 // Map style
@@ -191,6 +210,57 @@ CandidateDetailsTable.propTypes = {
   ).isRequired,
   selectedCandidates: PropTypes.object.isRequired,
   setSelectedCandidates: PropTypes.func.isRequired,
+};
+
+const VotePercentageBarChart = ({ votePercentages }) => {
+  // Calculate the total votes
+  const totalVotes = votePercentages.reduce(
+    (acc, candidate) => acc + candidate.Votes,
+    0
+  );
+
+  const options = {
+    indexAxis: "y",
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: false,
+      },
+    },
+    scales: {
+      x: {
+        stacked: true,
+        display: false,
+        ticks: {
+          callback: function (value) {
+            return `${value}%`;
+          },
+        },
+      },
+      y: {
+        stacked: true,
+        display: false,
+      },
+    },
+  };
+
+  const colors = ["#006a4e", "#F6F600", "#DCDCDC"]; // Add more colors if there are more parties
+
+  const datasets = votePercentages.map((item, index) => ({
+    label: item.CandidateName + " (" + item.Party + ")",
+    data: [((item.Votes / totalVotes) * 100).toFixed(2)], // Calculate the percentage and fix to 2 decimal places
+    backgroundColor: colors[index % colors.length],
+  }));
+
+  const data = {
+    labels: ["Election Candidates"],
+    datasets,
+  };
+
+  return <Bar options={options} data={data} height="30%" />;
 };
 
 const ConstituencyLabels = ({ geojsonData, onAreaClick }) => {
@@ -383,7 +453,13 @@ const Constituencies = () => {
               <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                 Constituency Name: {currentFeature.properties.cst_n}
               </Typography>
-              {/* Fetch and display election data */}
+              <VotePercentageBarChart
+                votePercentages={
+                  currentFeature
+                    ? getElectionDataForFeature(currentFeature.properties.cst)
+                    : []
+                }
+              />
               <CandidateDetailsTable
                 data={
                   currentFeature
