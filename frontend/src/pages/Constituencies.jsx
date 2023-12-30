@@ -67,6 +67,7 @@ const CandidateDetailsTable = ({
   data,
   selectedCandidates,
   setSelectedCandidates,
+  onVoteSuccess,
 }) => {
   const handleCheck = (candidateName) => {
     setSelectedCandidates((currentSelected) => {
@@ -118,6 +119,8 @@ const CandidateDetailsTable = ({
         message: "Vote added successfully!",
         severity: "success",
       });
+      // Call the passed fetchElectionData function to refresh data
+      onVoteSuccess();
     } catch (error) {
       setSnackbarInfo({
         open: true,
@@ -210,6 +213,7 @@ CandidateDetailsTable.propTypes = {
   ).isRequired,
   selectedCandidates: PropTypes.object.isRequired,
   setSelectedCandidates: PropTypes.func.isRequired,
+  onVoteSuccess: PropTypes.func.isRequired,
 };
 
 const VotePercentageBarChart = ({ votePercentages }) => {
@@ -229,6 +233,16 @@ const VotePercentageBarChart = ({ votePercentages }) => {
       title: {
         display: false,
       },
+      datalabels: {
+        display: true,
+        color: "white",
+        anchor: "end",
+        align: "start",
+        offset: -10,
+        formatter: (value, context) => {
+          return context.chart.data.labels[context.dataIndex];
+        },
+      },
     },
     scales: {
       x: {
@@ -246,13 +260,45 @@ const VotePercentageBarChart = ({ votePercentages }) => {
       },
     },
   };
+  const barTextPlugin = {
+    id: "barTextPlugin",
+    afterDatasetsDraw(chart, args, pluginOptions) {
+      const ctx = chart.ctx;
+      chart.data.datasets.forEach((dataset, i) => {
+        const meta = chart.getDatasetMeta(i);
+        meta.data.forEach((bar, index) => {
+          // Set the text styling
+          ctx.fillStyle = "black";
+          const fontSize = 14;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.font = `${fontSize}px Arial`;
 
-  const colors = ["#006a4e", "#F6F600", "#DCDCDC"]; // Add more colors if there are more parties
+          // Retrieve the party name from the dataset
+          const partyName = dataset.party;
+
+          // For horizontal centering, use the center of the bar's width
+          const xPos = bar.getCenterPoint().x;
+
+          // For vertical centering, use the center of the bar's height
+          const yPos = bar.getCenterPoint().y;
+
+          // Draw the text if there's enough room within the bar
+          if (bar.width > ctx.measureText(partyName).width) {
+            ctx.fillText(partyName, xPos, yPos);
+          }
+        });
+      });
+    },
+  };
+
+  const colors = ["#006a4e", "#F6F600", "#DCDCDC"];
 
   const datasets = votePercentages.map((item, index) => ({
-    label: item.CandidateName + " (" + item.Party + ")",
+    label: item.CandidateName,
     data: [((item.Votes / totalVotes) * 100).toFixed(2)], // Calculate the percentage and fix to 2 decimal places
     backgroundColor: colors[index % colors.length],
+    party: item.Party,
   }));
 
   const data = {
@@ -260,7 +306,9 @@ const VotePercentageBarChart = ({ votePercentages }) => {
     datasets,
   };
 
-  return <Bar options={options} data={data} height="30%" />;
+  return (
+    <Bar options={options} data={data} height="30%" plugins={[barTextPlugin]} />
+  );
 };
 
 const ConstituencyLabels = ({ geojsonData, onAreaClick }) => {
@@ -327,21 +375,21 @@ const Constituencies = () => {
     setCurrentFeature(feature);
     setModalOpen(true);
   };
+  const fetchElectionData = async () => {
+    try {
+      const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+      const response = await fetch(`${apiUrl}/election_data`);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setElectionData(data);
+    } catch (error) {
+      setError(error);
+    }
+  };
   // Fetching election data from the API
   useEffect(() => {
-    const fetchElectionData = async () => {
-      try {
-        const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
-        const response = await fetch(`${apiUrl}/election_data`);
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setElectionData(data);
-      } catch (error) {
-        setError(error);
-      }
-    };
     fetchElectionData();
   }, []);
 
@@ -468,6 +516,7 @@ const Constituencies = () => {
                 }
                 selectedCandidates={selectedCandidates}
                 setSelectedCandidates={setSelectedCandidates}
+                onVoteSuccess={fetchElectionData} // Pass fetchElectionData here
               />
             </>
           )}
