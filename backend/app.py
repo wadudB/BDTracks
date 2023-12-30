@@ -144,6 +144,7 @@ def election_data():
             SELECT 
                 c.id as ConstituencyID,
                 c.name as ConstituencyName,
+                can.id as CandidateId,
                 can.name as CandidateName,
                 can.party as Party,
                 can.votes as Votes
@@ -168,6 +169,36 @@ def election_data():
             cursor.close()
         if "conn" in locals() and conn.is_connected():
             conn.close()
+
+
+@app.route("/submit_vote", methods=["POST"])
+def submit_vote():
+    data = request.get_json()
+    candidate_id = data.get("candidateId")  # Changed to candidateId
+
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM candidates WHERE id = %s", (candidate_id,))
+    candidate = cursor.fetchone()
+
+    if candidate:
+        new_votes = candidate["votes"] + 1
+        cursor.execute(
+            "UPDATE candidates SET votes = %s WHERE id = %s",
+            (new_votes, candidate_id),  # Changed to update by ID
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return (
+            jsonify({"message": "Vote recorded successfully", "votes": new_votes}),
+            200,
+        )
+    else:
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Candidate not found"}), 404
 
 
 if __name__ == "__main__":

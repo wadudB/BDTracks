@@ -22,7 +22,8 @@ import "leaflet/dist/leaflet.css";
 import "../css/leaflet.css";
 import PropTypes from "prop-types";
 import { Checkbox, Button } from "@mui/material";
-
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 const DashboardPaper = React.lazy(() => import("../components/DashboardPaper"));
 
 // Map style
@@ -33,7 +34,7 @@ const CustomMapContainer = styled(MapContainer)({
 });
 
 // Create a custom-styled button
-const CustomButton = styled(Button)(({ theme }) => ({
+const CustomButton = styled(Button)(() => ({
   // Apply styles when the button is disabled
   "&.Mui-disabled": {
     color: "rgb(255 255 255 / 26%)",
@@ -43,22 +44,83 @@ const CustomButton = styled(Button)(({ theme }) => ({
 }));
 
 // Table component for displaying candidate details
-const CandidateDetailsTable = ({ data }) => {
-  const [selectedCandidates, setSelectedCandidates] = useState({});
+const CandidateDetailsTable = ({
+  data,
+  selectedCandidates,
+  setSelectedCandidates,
+}) => {
   const handleCheck = (candidateName) => {
-    setSelectedCandidates((prev) => ({
-      ...prev,
-      [candidateName]: !prev[candidateName],
-    }));
+    setSelectedCandidates((currentSelected) => {
+      const newSelected = Object.keys(currentSelected).reduce((acc, key) => {
+        acc[key] = false;
+        return acc;
+      }, {});
+      newSelected[candidateName] = true;
+      return newSelected;
+    });
   };
 
-  const handleVote = (candidateName) => {
-    // Implement vote logic here
-    alert(`Vote recorded for ${candidateName}`);
+  const [snackbarInfo, setSnackbarInfo] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarInfo({ ...snackbarInfo, open: false });
+  };
+
+  const handleVote = async (candidateId) => {
+    const voteData = {
+      candidateId: candidateId,
+    };
+
+    try {
+      const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+      const response = await fetch(`${apiUrl}/submit_vote`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(voteData),
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(responseData.message || "Failed to add Vote");
+      }
+
+      setSnackbarInfo({
+        open: true,
+        message: "Vote added successfully!",
+        severity: "success",
+      });
+    } catch (error) {
+      setSnackbarInfo({
+        open: true,
+        message: error.message || "Error adding Vote",
+        severity: "error",
+      });
+    }
   };
 
   return (
     <TableContainer component={Paper} sx={{ mt: 2 }}>
+      <Snackbar
+        open={snackbarInfo.open}
+        autoHideDuration={5000} // Hide after 5 seconds
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        sx={{ width: "100%" }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarInfo.severity}>
+          {snackbarInfo.message}
+        </Alert>
+      </Snackbar>
       <Table
         sx={{
           backgroundColor: "#202940",
@@ -93,9 +155,8 @@ const CandidateDetailsTable = ({ data }) => {
               <TableCell style={{ color: "white" }} align="right">
                 <Checkbox
                   sx={{ color: "white" }}
-                  checked={!!selectedCandidates[row.CandidateName]}
+                  checked={selectedCandidates[row.CandidateName] || false}
                   onChange={() => handleCheck(row.CandidateName)}
-                  // Assuming Nomination Withdrawn is a status you can check in your data
                   disabled={row.CandidateName === "Nomination Withdrawn"}
                 />
               </TableCell>
@@ -103,7 +164,7 @@ const CandidateDetailsTable = ({ data }) => {
                 <CustomButton
                   variant="contained"
                   color="primary"
-                  onClick={() => handleVote(row.CandidateName)}
+                  onClick={() => handleVote(row.CandidateId)}
                   disabled={
                     !selectedCandidates[row.CandidateName] ||
                     row.CandidateName === "Nomination Withdrawn"
@@ -128,6 +189,8 @@ CandidateDetailsTable.propTypes = {
       // Add other properties as necessary
     })
   ).isRequired,
+  selectedCandidates: PropTypes.object.isRequired,
+  setSelectedCandidates: PropTypes.func.isRequired,
 };
 
 const ConstituencyLabels = ({ geojsonData, onAreaClick }) => {
@@ -166,13 +229,14 @@ const Constituencies = () => {
   const [currentFeature, setCurrentFeature] = useState(null);
   const [error, setError] = useState(null);
   const [electionData, setElectionData] = useState([]);
+  const [selectedCandidates, setSelectedCandidates] = useState({});
 
   const modalStyle = {
     position: "absolute",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: isSmallScreen ? "90%" : 500, // Responsive width
+    width: isSmallScreen ? "90%" : 500,
     bgcolor: "#141d33",
     border: "2px solid #000",
     boxShadow: 24,
@@ -211,9 +275,24 @@ const Constituencies = () => {
     fetchElectionData();
   }, []);
 
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    // Reset the selected candidates when closing the modal
+    if (currentFeature) {
+      const candidates = getElectionDataForFeature(
+        currentFeature.properties.cst
+      );
+      setSelectedCandidates(
+        candidates.reduce((acc, candidate) => {
+          acc[candidate.CandidateName] = false;
+          return acc;
+        }, {})
+      );
+    }
+  };
+
   // Find election data for the current feature
   const getElectionDataForFeature = (featureCst) => {
-    // Assuming electionData is an array of candidates
     const constituencyCandidates = electionData.filter(
       (data) => data.ConstituencyID === featureCst
     );
@@ -288,7 +367,7 @@ const Constituencies = () => {
       </Grid2>
       <Modal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={handleCloseModal}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -296,7 +375,7 @@ const Constituencies = () => {
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Constituency Details
           </Typography>
-          {currentFeature && ( // Check if currentFeature is not null
+          {currentFeature && (
             <>
               <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                 Constituency ID: {currentFeature.properties.cst}
@@ -311,6 +390,8 @@ const Constituencies = () => {
                     ? getElectionDataForFeature(currentFeature.properties.cst)
                     : []
                 }
+                selectedCandidates={selectedCandidates}
+                setSelectedCandidates={setSelectedCandidates}
               />
             </>
           )}
