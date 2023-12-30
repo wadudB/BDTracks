@@ -21,33 +21,42 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "../css/leaflet.css";
 import PropTypes from "prop-types";
+import { Checkbox, Button } from "@mui/material";
 
 const DashboardPaper = React.lazy(() => import("../components/DashboardPaper"));
 
-// Modal style
-const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 500,
-  bgcolor: "#141d33",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 2,
-  borderRadius: "9px",
-};
-
 // Map style
 const CustomMapContainer = styled(MapContainer)({
-  backgroundColor: "transparent",
   height: "1000px",
   width: "100%",
   borderRadius: "8px",
 });
 
+// Create a custom-styled button
+const CustomButton = styled(Button)(({ theme }) => ({
+  // Apply styles when the button is disabled
+  "&.Mui-disabled": {
+    color: "rgb(255 255 255 / 26%)",
+    boxShadow: "none",
+    backgroundColor: "rgb(255 255 255 / 12%)",
+  },
+}));
+
 // Table component for displaying candidate details
 const CandidateDetailsTable = ({ data }) => {
+  const [selectedCandidates, setSelectedCandidates] = useState({});
+  const handleCheck = (candidate) => {
+    setSelectedCandidates((prev) => ({
+      ...prev,
+      [candidate]: !prev[candidate],
+    }));
+  };
+
+  const handleVote = (candidate) => {
+    // Implement vote logic here
+    alert(`Vote recorded for ${candidate}`);
+  };
+
   return (
     <TableContainer component={Paper} sx={{ mt: 2 }}>
       <Table
@@ -61,22 +70,46 @@ const CandidateDetailsTable = ({ data }) => {
         <TableHead style={{ backgroundColor: "#141d33" }}>
           <TableRow>
             <TableCell style={{ color: "white" }}>Candidate</TableCell>
-            <TableCell align="right" style={{ color: "white" }}>
+            <TableCell style={{ color: "white" }} align="right">
               Party
+            </TableCell>
+            <TableCell style={{ color: "white" }} align="right">
+              Select
+            </TableCell>
+            <TableCell style={{ color: "white" }} align="right">
+              Vote
             </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {data.map((row, index) => (
-            <TableRow
-              key={index}
-              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-            >
+            <TableRow key={index}>
               <TableCell component="th" scope="row" style={{ color: "white" }}>
                 {row.Candidate}
               </TableCell>
-              <TableCell align="right" style={{ color: "white" }}>
+              <TableCell style={{ color: "white" }} align="right">
                 {row.Party}
+              </TableCell>
+              <TableCell style={{ color: "white" }} align="right">
+                <Checkbox
+                  sx={{ color: "white" }}
+                  checked={!!selectedCandidates[row.Candidate]}
+                  onChange={() => handleCheck(row.Candidate)}
+                  disabled={row.Candidate === "Nomination Withdrawn"} // Disable checkbox if status is "Nomination Withdrawn"
+                />
+              </TableCell>
+              <TableCell style={{ color: "white" }} align="right">
+                <CustomButton
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleVote(row.Candidate)}
+                  disabled={
+                    !selectedCandidates[row.Candidate] ||
+                    row.Candidate === "Nomination Withdrawn"
+                  }
+                >
+                  Vote
+                </CustomButton>
               </TableCell>
             </TableRow>
           ))}
@@ -130,6 +163,21 @@ const Constituencies = () => {
   const [currentFeature, setCurrentFeature] = useState(null);
   const [error, setError] = useState(null);
   const [electionData, setElectionData] = useState([]);
+
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: isSmallScreen ? "90%" : 500, // Responsive width
+    bgcolor: "#141d33",
+    border: "2px solid #000",
+    boxShadow: 24,
+    p: 2,
+    borderRadius: "9px",
+    overflowY: "auto",
+    maxHeight: "90vh",
+  };
 
   useEffect(() => {
     const geojsonURL = "/constituency_map.json";
@@ -226,7 +274,7 @@ const Constituencies = () => {
       <Grid2 xs={12} md={12}>
         <DashboardPaper>
           <Typography variant="subtitle2" className="!mb-4 !text-lg">
-            Real-Time
+            Click on the number to see details
           </Typography>
           <CustomMapContainer center={[23.685, 90.3563]} zoom={8}>
             {geojsonData && (
@@ -262,10 +310,10 @@ const Constituencies = () => {
           {currentFeature && ( // Check if currentFeature is not null
             <>
               <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                Name: {currentFeature.properties.cst_n}
+                Constituency ID: {currentFeature.properties.cst}
               </Typography>
               <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                Number: {currentFeature.properties.cst}
+                Constituency Name: {currentFeature.properties.cst_n}
               </Typography>
               {/* Fetch and display election data */}
               <CandidateDetailsTable

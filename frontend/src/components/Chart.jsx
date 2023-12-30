@@ -27,19 +27,30 @@ const Chart = ({ monthlyInjured, monthlyDeaths, accidentData, viewMode }) => {
 
     if (viewMode === "yearly") {
       // Yearly data logic
-      const yearlyData = accidentData.map((data) => ({
-        year: data.year,
-        totalKilled: data.total_killed,
-        totalInjured: data.total_injured,
-      }));
+      const yearlyData = accidentData
+        .map((data) => ({
+          year: data.year,
+          totalKilled: data.total_killed,
+          totalInjured: data.total_injured,
+        }))
+        .sort((a, b) => a.year - b.year); // Sort based on year
+
       labels = yearlyData.map((data) => data.year.toString());
       deathData = yearlyData.map((data) => data.totalKilled);
       injuredData = yearlyData.map((data) => data.totalInjured);
     } else {
       // Monthly data logic
-      labels = Object.keys(monthlyDeaths).sort();
-      deathData = Object.values(monthlyDeaths);
-      injuredData = Object.values(monthlyInjured);
+      const sortedMonths = Object.keys(monthlyDeaths).sort(
+        (a, b) => new Date(a) - new Date(b)
+      ); // Sort based on month
+      labels = sortedMonths.map((month) => {
+        const date = new Date(month);
+        return date.toLocaleString("default", {
+          month: "short",
+        });
+      });
+      deathData = sortedMonths.map((month) => monthlyDeaths[month]);
+      injuredData = sortedMonths.map((month) => monthlyInjured[month]);
     }
 
     // Common dataset configuration

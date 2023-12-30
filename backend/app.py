@@ -141,7 +141,18 @@ def election_data():
 
             # SQL query
             query = """
-            SELECT * FROM `2024_bangladesh_election`;
+            SELECT 
+                c.id as ConstituencyID,
+                c.name as ConstituencyName,
+                can.name as CandidateName,
+                can.party as Party,
+                can.votes as Votes
+            FROM 
+                constituencies c
+            INNER JOIN 
+                candidates can ON c.id = can.constituency_id
+            ORDER BY 
+                c.id ;
             """
 
             cursor.execute(query)
