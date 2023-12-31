@@ -15,7 +15,7 @@ import {
 import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { MapContainer, GeoJSON, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -216,7 +216,7 @@ CandidateDetailsTable.propTypes = {
   onVoteSuccess: PropTypes.func.isRequired,
 };
 
-const VotePercentageBarChart = ({ votePercentages }) => {
+const VotePercentageBarChart = React.memo(({ votePercentages }) => {
   // Calculate the total votes
   const totalVotes = votePercentages.reduce(
     (acc, candidate) => acc + candidate.Votes,
@@ -309,7 +309,10 @@ const VotePercentageBarChart = ({ votePercentages }) => {
   return (
     <Bar options={options} data={data} height="30%" plugins={[barTextPlugin]} />
   );
-};
+});
+
+VotePercentageBarChart.displayName = "VotePercentageBarChart";
+
 // prop types validation for votePercentages
 VotePercentageBarChart.propTypes = {
   votePercentages: PropTypes.arrayOf(
@@ -473,6 +476,12 @@ const Constituencies = () => {
     );
     return constituencyCandidates;
   };
+  // Define votePercentages with useMemo
+  const votePercentages = useMemo(() => {
+    return currentFeature
+      ? getElectionDataForFeature(currentFeature.properties.cst)
+      : [];
+  }, [currentFeature, electionData]);
   if (error)
     return (
       <Box
@@ -569,13 +578,7 @@ const Constituencies = () => {
               <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                 Constituency Name: {currentFeature.properties.cst_n}
               </Typography>
-              <VotePercentageBarChart
-                votePercentages={
-                  currentFeature
-                    ? getElectionDataForFeature(currentFeature.properties.cst)
-                    : []
-                }
-              />
+              <VotePercentageBarChart votePercentages={votePercentages} />
               <CandidateDetailsTable
                 data={
                   currentFeature
