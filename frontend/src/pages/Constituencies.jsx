@@ -16,8 +16,7 @@ import { styled } from "@mui/system";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import React, { useState, useEffect, useMemo } from "react";
-import { MapContainer, GeoJSON, useMap } from "react-leaflet";
-import L from "leaflet";
+import { MapContainer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "../css/leaflet.css";
 import PropTypes from "prop-types";
@@ -25,6 +24,8 @@ import { Checkbox, Button } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import { Bar } from "react-chartjs-2";
+import "leaflet-boundary-canvas";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -44,13 +45,9 @@ ChartJS.register(
   Legend
 );
 const DashboardPaper = React.lazy(() => import("../components/DashboardPaper"));
-
-// Map style
-const CustomMapContainer = styled(MapContainer)({
-  height: "1000px",
-  width: "100%",
-  borderRadius: "8px",
-});
+const MapLogicComponent = React.lazy(() =>
+  import("../components/MapLogicComponent")
+);
 
 // Create a custom-styled button
 const CustomButton = styled(Button)(() => ({
@@ -323,33 +320,6 @@ VotePercentageBarChart.propTypes = {
     })
   ).isRequired,
 };
-const ConstituencyLabels = ({ geojsonData, onAreaClick }) => {
-  const map = useMap();
-
-  useEffect(() => {
-    if (geojsonData) {
-      const markers = geojsonData.features.map((feature) => {
-        const centroid = L.geoJSON(feature.geometry).getBounds().getCenter();
-        const marker = L.marker(centroid, {
-          icon: L.divIcon({
-            className: "constituency-label",
-            html: `<div style="color: #000000;">${feature.properties.cst.toString()}</div>`, // Set the color here
-          }),
-        });
-        marker.on("click", () => onAreaClick(feature));
-        return marker;
-      });
-
-      const markersGroup = L.featureGroup(markers).addTo(map);
-
-      return () => {
-        markersGroup.clearLayers();
-      };
-    }
-  }, [geojsonData, map, onAreaClick]);
-
-  return null;
-};
 
 const Constituencies = () => {
   const theme = useTheme();
@@ -449,7 +419,7 @@ const Constituencies = () => {
         return "#B58C33";
       // Add more parties and their colors as needed
       default:
-        return "#244999"; // Default color
+        return "#485147"; // Default color
     }
   };
 
@@ -526,38 +496,24 @@ const Constituencies = () => {
       <Grid2 xs={12} md={12}>
         <DashboardPaper>
           <Typography variant="subtitle2" className="!mb-4 !text-lg">
-            Click on the number to see details
+            Click on the Constituency to see details
           </Typography>
-          <CustomMapContainer center={[23.685, 90.3563]} zoom={8}>
+          <MapContainer
+            center={[23.685, 90.3563]}
+            // zoom={9}
+            style={{ height: "1200px", width: "100%", borderRadius: "8px" }}
+            minZoom={8} // Minimum zoom level allowed
+            maxZoom={11} // Maximum zoom level allowed
+          >
             {geojsonData && (
-              <GeoJSON
-                data={geojsonData}
-                style={(feature) => {
-                  const constituencyId = feature.properties.cst;
-                  const leadingParty = leadingParties[constituencyId]?.Party;
-                  return {
-                    fillColor: getColorForParty(leadingParty),
-                    fillOpacity: "1",
-                    color: "#decdcd",
-                    weight: 1,
-                  };
-                }}
-                onEachFeature={(feature, layer) => {
-                  layer.on({
-                    click: () => {
-                      handleAreaClick(feature);
-                    },
-                  });
-                }}
-              />
-            )}
-            {geojsonData && (
-              <ConstituencyLabels
+              <MapLogicComponent
                 geojsonData={geojsonData}
                 onAreaClick={handleAreaClick}
+                leadingParties={leadingParties}
+                getColorForParty={getColorForParty}
               />
             )}
-          </CustomMapContainer>
+          </MapContainer>
         </DashboardPaper>
       </Grid2>
       <Modal
@@ -595,26 +551,6 @@ const Constituencies = () => {
       </Modal>
     </Box>
   );
-};
-
-ConstituencyLabels.propTypes = {
-  geojsonData: PropTypes.shape({
-    features: PropTypes.arrayOf(
-      PropTypes.shape({
-        type: PropTypes.string.isRequired,
-        geometry: PropTypes.shape({
-          type: PropTypes.string.isRequired,
-          coordinates: PropTypes.array.isRequired,
-        }).isRequired,
-        properties: PropTypes.shape({
-          cst: PropTypes.number.isRequired,
-          cst_n: PropTypes.string.isRequired,
-          // Include other properties as necessary
-        }).isRequired,
-      })
-    ).isRequired,
-  }).isRequired,
-  onAreaClick: PropTypes.func.isRequired,
 };
 
 export default Constituencies;
