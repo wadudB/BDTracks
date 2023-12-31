@@ -262,11 +262,11 @@ const VotePercentageBarChart = ({ votePercentages }) => {
   };
   const barTextPlugin = {
     id: "barTextPlugin",
-    afterDatasetsDraw(chart, args, pluginOptions) {
+    afterDatasetsDraw(chart) {
       const ctx = chart.ctx;
       chart.data.datasets.forEach((dataset, i) => {
         const meta = chart.getDatasetMeta(i);
-        meta.data.forEach((bar, index) => {
+        meta.data.forEach((bar) => {
           // Set the text styling
           ctx.fillStyle = "black";
           const fontSize = 14;
@@ -295,7 +295,7 @@ const VotePercentageBarChart = ({ votePercentages }) => {
   const colors = ["#006a4e", "#F6F600", "#DCDCDC"];
 
   const datasets = votePercentages.map((item, index) => ({
-    label: item.CandidateName,
+    label: "Percentage",
     data: [((item.Votes / totalVotes) * 100).toFixed(2)], // Calculate the percentage and fix to 2 decimal places
     backgroundColor: colors[index % colors.length],
     party: item.Party,
@@ -310,7 +310,16 @@ const VotePercentageBarChart = ({ votePercentages }) => {
     <Bar options={options} data={data} height="30%" plugins={[barTextPlugin]} />
   );
 };
-
+// prop types validation for votePercentages
+VotePercentageBarChart.propTypes = {
+  votePercentages: PropTypes.arrayOf(
+    PropTypes.shape({
+      CandidateName: PropTypes.string.isRequired,
+      Votes: PropTypes.number.isRequired,
+      Party: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+};
 const ConstituencyLabels = ({ geojsonData, onAreaClick }) => {
   const map = useMap();
 
@@ -321,7 +330,7 @@ const ConstituencyLabels = ({ geojsonData, onAreaClick }) => {
         const marker = L.marker(centroid, {
           icon: L.divIcon({
             className: "constituency-label",
-            html: feature.properties.cst.toString(),
+            html: `<div style="color: #000000;">${feature.properties.cst.toString()}</div>`, // Set the color here
           }),
         });
         marker.on("click", () => onAreaClick(feature));
@@ -348,6 +357,7 @@ const Constituencies = () => {
   const [error, setError] = useState(null);
   const [electionData, setElectionData] = useState([]);
   const [selectedCandidates, setSelectedCandidates] = useState({});
+  const [leadingParties, setLeadingParties] = useState({});
 
   const modalStyle = {
     position: "absolute",
@@ -392,6 +402,53 @@ const Constituencies = () => {
   useEffect(() => {
     fetchElectionData();
   }, []);
+
+  useEffect(() => {
+    // When electionData is fetched successfully, compute the leading parties
+    const newLeadingParties = getLeadingPartyByConstituency(electionData);
+    setLeadingParties(newLeadingParties);
+  }, [electionData]);
+
+  const getLeadingPartyByConstituency = (electionData) => {
+    const leadingParties = {};
+
+    electionData.forEach((data) => {
+      // Initialize if not present
+      if (!leadingParties[data.ConstituencyID]) {
+        leadingParties[data.ConstituencyID] = { Party: null, Votes: 0 };
+      }
+
+      // Update if current party has more votes and votes are greater than zero
+      if (
+        data.Votes > leadingParties[data.ConstituencyID].Votes &&
+        data.Votes > 0
+      ) {
+        leadingParties[data.ConstituencyID] = {
+          Party: data.Party,
+          Votes: data.Votes,
+        };
+      }
+    });
+
+    return leadingParties;
+  };
+
+  const getColorForParty = (party) => {
+    // Return color based on party
+    switch (party) {
+      case "AL":
+        return "#006a4e";
+      case "JP(E)":
+        return "#F6F600";
+      case "Independent":
+        return "#DCDCDC";
+      case "KSJL":
+        return "#B58C33";
+      // Add more parties and their colors as needed
+      default:
+        return "#244999"; // Default color
+    }
+  };
 
   const handleCloseModal = () => {
     setModalOpen(false);
@@ -466,12 +523,23 @@ const Constituencies = () => {
             {geojsonData && (
               <GeoJSON
                 data={geojsonData}
-                style={() => ({
-                  fillColor: "#244999",
-                  fillOpacity: "1",
-                  color: "white",
-                  weight: 1,
-                })}
+                style={(feature) => {
+                  const constituencyId = feature.properties.cst;
+                  const leadingParty = leadingParties[constituencyId]?.Party;
+                  return {
+                    fillColor: getColorForParty(leadingParty),
+                    fillOpacity: "1",
+                    color: "#decdcd",
+                    weight: 1,
+                  };
+                }}
+                onEachFeature={(feature, layer) => {
+                  layer.on({
+                    click: () => {
+                      handleAreaClick(feature);
+                    },
+                  });
+                }}
               />
             )}
             {geojsonData && (

@@ -110,7 +110,7 @@ const Navbar = () => {
           ) : (
             <div>
               <StyledLink to="/">Road Accident Dashboard</StyledLink>
-              <StyledLink to="/commodities">Commodities</StyledLink>
+              {/* <StyledLink to="/commodities">Commodities</StyledLink> */}
               <StyledLink to="/constituencies_poll">Constituencies</StyledLink>
             </div>
           )}
