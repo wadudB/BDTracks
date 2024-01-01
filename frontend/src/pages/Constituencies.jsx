@@ -45,9 +45,17 @@ ChartJS.register(
   Legend
 );
 const DashboardPaper = React.lazy(() => import("../components/DashboardPaper"));
+const PartyGrid = React.lazy(() => import("../components/PartyGrid"));
 const MapLogicComponent = React.lazy(() =>
   import("../components/MapLogicComponent")
 );
+// const VotePercentageBarChart = React.lazy(() =>
+//   import("../components/VotePercentageBarChart")
+// );
+
+// const CandidateDetailsTable = React.lazy(() =>
+//   import("../components/CandidateDetailsTable")
+// );
 
 // Create a custom-styled button
 const CustomButton = styled(Button)(() => ({
@@ -332,6 +340,9 @@ const Constituencies = () => {
   const [selectedCandidates, setSelectedCandidates] = useState({});
   const [leadingParties, setLeadingParties] = useState({});
 
+  const mapHeight = isSmallScreen ? "60vh" : "130vh";
+  const defaultZoom = isSmallScreen ? 7.8 : 8;
+
   const modalStyle = {
     position: "absolute",
     top: "50%",
@@ -346,18 +357,7 @@ const Constituencies = () => {
     overflowY: "auto",
     maxHeight: "90vh",
   };
-
-  useEffect(() => {
-    const geojsonURL = "/constituency_map.json";
-    fetch(geojsonURL)
-      .then((response) => response.json())
-      .then((data) => setGeojsonData(data));
-  }, []);
-
-  const handleAreaClick = (feature) => {
-    setCurrentFeature(feature);
-    setModalOpen(true);
-  };
+  // Utility Functions
   const fetchElectionData = async () => {
     try {
       const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
@@ -371,16 +371,6 @@ const Constituencies = () => {
       setError(error);
     }
   };
-  // Fetching election data from the API
-  useEffect(() => {
-    fetchElectionData();
-  }, []);
-
-  useEffect(() => {
-    // When electionData is fetched successfully, compute the leading parties
-    const newLeadingParties = getLeadingPartyByConstituency(electionData);
-    setLeadingParties(newLeadingParties);
-  }, [electionData]);
 
   const getLeadingPartyByConstituency = (electionData) => {
     const leadingParties = {};
@@ -405,7 +395,6 @@ const Constituencies = () => {
 
     return leadingParties;
   };
-
   const getColorForParty = (party) => {
     // Return color based on party
     switch (party) {
@@ -421,6 +410,41 @@ const Constituencies = () => {
       default:
         return "#485147"; // Default color
     }
+  };
+
+  // Find election data for the current feature
+  const getElectionDataForFeature = (featureCst) => {
+    const constituencyCandidates = electionData.filter(
+      (data) => data.ConstituencyID === featureCst
+    );
+    return constituencyCandidates;
+  };
+
+  // useEffect Hooks
+  // Fetching election data from the API
+  useEffect(() => {
+    fetchElectionData();
+  }, []);
+
+  // Compute Leading Parties
+  useEffect(() => {
+    const newLeadingParties = getLeadingPartyByConstituency(electionData);
+    setLeadingParties(newLeadingParties);
+  }, [electionData]);
+
+  // Fetch geojsonData
+  useEffect(() => {
+    // const geojsonURL = "/constituency_map.json";
+    const geojsonURL = "/test2.geojson";
+    fetch(geojsonURL)
+      .then((response) => response.json())
+      .then((data) => setGeojsonData(data));
+  }, []);
+
+  // Event Handlers
+  const handleAreaClick = (feature) => {
+    setCurrentFeature(feature);
+    setModalOpen(true);
   };
 
   const handleCloseModal = () => {
@@ -439,19 +463,14 @@ const Constituencies = () => {
     }
   };
 
-  // Find election data for the current feature
-  const getElectionDataForFeature = (featureCst) => {
-    const constituencyCandidates = electionData.filter(
-      (data) => data.ConstituencyID === featureCst
-    );
-    return constituencyCandidates;
-  };
   // Define votePercentages with useMemo
   const votePercentages = useMemo(() => {
     return currentFeature
       ? getElectionDataForFeature(currentFeature.properties.cst)
       : [];
   }, [currentFeature, electionData]);
+
+  // Conditional Rendering
   if (error)
     return (
       <Box
@@ -495,15 +514,31 @@ const Constituencies = () => {
       </div>
       <Grid2 xs={12} md={12}>
         <DashboardPaper>
-          <Typography variant="subtitle2" className="!mb-4 !text-lg">
+          <Typography
+            variant={isSmallScreen ? "subtitle1" : "h6"}
+            className={`!mb-4 ${isSmallScreen ? "!text-sm" : "!text-lg"}`}
+          >
+            Constituency projections
+          </Typography>
+          {Object.keys(leadingParties).length > 0 && (
+            <PartyGrid leadingParties={leadingParties} />
+          )}
+        </DashboardPaper>
+      </Grid2>
+      <Grid2 xs={12} md={12} pt={3}>
+        <DashboardPaper>
+          <Typography
+            variant={isSmallScreen ? "subtitle1" : "h6"}
+            className={`!mb-4 ${isSmallScreen ? "!text-sm" : "!text-lg"}`}
+          >
             Click on the Constituency to see details
           </Typography>
           <MapContainer
             center={[23.685, 90.3563]}
-            // zoom={9}
-            style={{ height: "1200px", width: "100%", borderRadius: "8px" }}
-            minZoom={8} // Minimum zoom level allowed
-            maxZoom={11} // Maximum zoom level allowed
+            // zoom={defaultZoom}
+            style={{ height: mapHeight, width: "100%", borderRadius: "8px" }}
+            minZoom={defaultZoom}
+            maxZoom={11}
           >
             {geojsonData && (
               <MapLogicComponent

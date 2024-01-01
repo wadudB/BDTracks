@@ -38,17 +38,22 @@ const MapLogicComponent = ({
       return;
     }
 
-    // Logic for setting up the tile layer
-    const osm = L.TileLayer.boundaryCanvas(
-      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      {
-        boundary: geojsonData,
-      }
-    );
-    map.addLayer(osm);
-    const ukLayer = L.geoJSON(geojsonData);
-    map.fitBounds(ukLayer.getBounds());
+    let osm, ukLayer;
 
+    if (!map._container_id) {
+      map._container_id = true;
+
+      // Logic for setting up the tile layer
+      const osm = L.TileLayer.boundaryCanvas(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          boundary: geojsonData,
+        }
+      );
+      map.addLayer(osm);
+      const ukLayer = L.geoJSON(geojsonData);
+      map.fitBounds(ukLayer.getBounds());
+    }
     // Logic for creating constituency labels
     const markers = geojsonData.features.map((feature) => {
       const centroid = L.geoJSON(feature.geometry).getBounds().getCenter();
@@ -66,7 +71,16 @@ const MapLogicComponent = ({
 
     // Cleanup function
     return () => {
-      markersGroup.clearLayers();
+      if (map && map.remove) {
+        markersGroup.clearLayers(); // Clear the markers
+        if (osm) {
+          map.removeLayer(osm); // Remove the boundaryCanvas layer if it's defined
+        }
+        // Remove ukLayer if added to the map and it's defined
+        if (ukLayer && map.hasLayer(ukLayer)) {
+          map.removeLayer(ukLayer);
+        }
+      }
     };
   }, [geojsonData]);
 

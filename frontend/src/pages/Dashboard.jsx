@@ -32,7 +32,9 @@ const Dashboard = () => {
   const [totalDeaths, setTotalDeaths] = useState(0);
   const [totalInjured, setTotalInjured] = useState(0);
   const [highestAccidentLocation, setHighestAccidentLocation] = useState("");
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState(
+    new Date().getFullYear() - 1
+  );
   const [dailyDeaths, setDailyDeaths] = useState({});
   const [dailyInjured, setDailyInjured] = useState({});
   const [monthlyDeaths, setMonthlyDeaths] = useState({});
@@ -82,7 +84,7 @@ const Dashboard = () => {
   useEffect(() => {
     // Filter the data for the selected year
     const selectedYearData = accidentData.find(
-      (item) => item.year === selectedYear
+      (item) => item.year === selectedYear - 1
     );
     // console.log(accidentData);
     if (selectedYearData) {
