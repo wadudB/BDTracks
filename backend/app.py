@@ -146,14 +146,20 @@ def election_data():
                 c.name as ConstituencyName,
                 can.id as CandidateId,
                 can.name as CandidateName,
-                can.party as Party,
-                can.votes as Votes
+                can.votes as Votes,
+                p.party_id,
+                p.alliance,
+                p.party as PartyName,
+                p.symbol as Party,
+                p.color
             FROM 
                 constituencies c
             INNER JOIN 
                 candidates can ON c.id = can.constituency_id
+            INNER JOIN 
+                parties p ON can.party_id = p.party_id
             ORDER BY 
-                c.id ;
+                c.id, can.votes DESC;
             """
 
             cursor.execute(query)
