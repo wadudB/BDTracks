@@ -22,22 +22,21 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+
 const PartyGrid = ({ leadingParties }) => {
-  // Initialize a tally object to count constituency wins
   const partiesArray = Object.values(leadingParties);
-  const constituencyWinsByParty =
-    partiesArray?.reduce((accumulator, { Party, Color }) => {
+  const constituencyWinsByParty = partiesArray.reduce(
+    (accumulator, { Party, Color }) => {
       if (Party) {
-        // Check if the Party value is not null or undefined
-        const existingParty = accumulator.find((item) => item.party === Party);
-        if (existingParty) {
-          existingParty.count += 1;
-        } else {
-          accumulator.push({ party: Party, count: 1, color: Color });
+        if (!accumulator[Party]) {
+          accumulator[Party] = { count: 0, color: Color };
         }
+        accumulator[Party].count += 1;
       }
       return accumulator;
-    }, []) || [];
+    },
+    {}
+  );
 
   const options = {
     indexAxis: "y",
@@ -108,11 +107,11 @@ const PartyGrid = ({ leadingParties }) => {
     },
   };
 
-  const datasets = constituencyWinsByParty.map((item) => ({
-    label: item.party,
-    data: [item.count], // Use the 'count' property from the object
-    backgroundColor: item.color,
-    party: item.party,
+  const datasets = Object.keys(constituencyWinsByParty).map((party) => ({
+    label: party,
+    data: [constituencyWinsByParty[party].count],
+    backgroundColor: constituencyWinsByParty[party].color,
+    party: party,
   }));
 
   const data = {
