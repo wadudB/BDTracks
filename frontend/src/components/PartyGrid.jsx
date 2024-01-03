@@ -26,20 +26,18 @@ const PartyGrid = ({ leadingParties }) => {
   // Initialize a tally object to count constituency wins
   const partiesArray = Object.values(leadingParties);
   const constituencyWinsByParty =
-    partiesArray?.reduce((accumulator, { Party }) => {
+    partiesArray?.reduce((accumulator, { Party, Color }) => {
       if (Party) {
         // Check if the Party value is not null or undefined
         const existingParty = accumulator.find((item) => item.party === Party);
         if (existingParty) {
           existingParty.count += 1;
         } else {
-          accumulator.push({ party: Party, count: 1 });
+          accumulator.push({ party: Party, count: 1, color: Color });
         }
       }
       return accumulator;
     }, []) || [];
-
-  // console.log("constituencyWinsByParty", constituencyWinsByParty);
 
   const options = {
     indexAxis: "y",
@@ -110,12 +108,10 @@ const PartyGrid = ({ leadingParties }) => {
     },
   };
 
-  const colors = ["#006a4e", "#F6F600", "#DCDCDC"];
-
-  const datasets = constituencyWinsByParty.map((item, index) => ({
+  const datasets = constituencyWinsByParty.map((item) => ({
     label: item.party,
     data: [item.count], // Use the 'count' property from the object
-    backgroundColor: colors[index % colors.length],
+    backgroundColor: item.color,
     party: item.party,
   }));
 
@@ -130,7 +126,7 @@ const PartyGrid = ({ leadingParties }) => {
 };
 
 PartyGrid.propTypes = {
-  leadingParties: PropTypes.object.isRequired, // Change the type to match your prop's type
+  leadingParties: PropTypes.object.isRequired,
 };
 
 export default PartyGrid;

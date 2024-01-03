@@ -84,7 +84,7 @@ const Dashboard = () => {
   useEffect(() => {
     // Filter the data for the selected year
     const selectedYearData = accidentData.find(
-      (item) => item.year === selectedYear - 1
+      (item) => item.year === selectedYear
     );
     // console.log(accidentData);
     if (selectedYearData) {

@@ -297,12 +297,10 @@ const VotePercentageBarChart = React.memo(({ votePercentages }) => {
     },
   };
 
-  const colors = ["#006a4e", "#F6F600", "#DCDCDC"];
-
-  const datasets = votePercentages.map((item, index) => ({
+  const datasets = votePercentages.map((item) => ({
     label: "Percentage",
-    data: [((item.Votes / totalVotes) * 100).toFixed(2)], // Calculate the percentage and fix to 2 decimal places
-    backgroundColor: colors[index % colors.length],
+    data: [((item.Votes / totalVotes) * 100).toFixed(2)],
+    backgroundColor: item.color,
     party: item.Party,
   }));
 
@@ -378,7 +376,11 @@ const Constituencies = () => {
     electionData.forEach((data) => {
       // Initialize if not present
       if (!leadingParties[data.ConstituencyID]) {
-        leadingParties[data.ConstituencyID] = { Party: null, Votes: 0 };
+        leadingParties[data.ConstituencyID] = {
+          Party: null,
+          Votes: 0,
+          Color: "#485147",
+        };
       }
 
       // Update if current party has more votes and votes are greater than zero
@@ -389,27 +391,12 @@ const Constituencies = () => {
         leadingParties[data.ConstituencyID] = {
           Party: data.Party,
           Votes: data.Votes,
+          Color: data.color,
         };
       }
     });
 
     return leadingParties;
-  };
-  const getColorForParty = (party) => {
-    // Return color based on party
-    switch (party) {
-      case "AL":
-        return "#006a4e";
-      case "JP(E)":
-        return "#F6F600";
-      case "Independent":
-        return "#DCDCDC";
-      case "KSJL":
-        return "#B58C33";
-      // Add more parties and their colors as needed
-      default:
-        return "#485147"; // Default color
-    }
   };
 
   // Find election data for the current feature
@@ -434,8 +421,7 @@ const Constituencies = () => {
 
   // Fetch geojsonData
   useEffect(() => {
-    // const geojsonURL = "/constituency_map.json";
-    const geojsonURL = "/test2.geojson";
+    const geojsonURL = "/constituency_map.json";
     fetch(geojsonURL)
       .then((response) => response.json())
       .then((data) => setGeojsonData(data));
@@ -545,7 +531,6 @@ const Constituencies = () => {
                 geojsonData={geojsonData}
                 onAreaClick={handleAreaClick}
                 leadingParties={leadingParties}
-                getColorForParty={getColorForParty}
               />
             )}
           </MapContainer>

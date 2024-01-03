@@ -24,13 +24,23 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-const MapLogicComponent = ({
-  geojsonData,
-  onAreaClick,
-  leadingParties,
-  getColorForParty,
-}) => {
+// const getColorForParty = (party) => {
+//   // Return color based on party
+//   switch (party) {
+//     case "AL":
+//       return "#006a4e";
+//     case "JP(E)":
+//       return "#F6F600";
+//     case "Independent":
+//       return "#DCDCDC";
+//     case "KSJL":
+//       return "#B58C33";
+//     // Add more parties and their colors as needed
+//     default:
+//       return "#485147"; // Default color
+//   }
+// };
+const MapLogicComponent = ({ geojsonData, onAreaClick, leadingParties }) => {
   const map = useMap();
 
   useEffect(() => {
@@ -89,9 +99,9 @@ const MapLogicComponent = ({
       data={geojsonData}
       style={(feature) => {
         const constituencyId = feature.properties.cst;
-        const leadingParty = leadingParties[constituencyId]?.Party;
+        const leadingParty = leadingParties[constituencyId]?.Color;
         return {
-          fillColor: getColorForParty(leadingParty),
+          fillColor: leadingParty,
           fillOpacity: "0.55",
           color: "#202940",
           weight: 1,
@@ -112,7 +122,6 @@ MapLogicComponent.propTypes = {
   geojsonData: PropTypes.object,
   onAreaClick: PropTypes.func.isRequired,
   leadingParties: PropTypes.object.isRequired,
-  getColorForParty: PropTypes.func.isRequired,
 };
 
 export default MapLogicComponent;

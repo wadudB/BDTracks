@@ -2,8 +2,12 @@ from flask import Flask, jsonify, request, current_app
 import mysql.connector
 from mysql.connector import Error
 from flask_cors import CORS
+import jwt
+import datetime
+from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "n1[S(Jc]G]}36$A|[PRv1XtMk~b-(uWG"
 CORS(app)
 
 # Database configuration
@@ -205,6 +209,305 @@ def submit_vote():
         cursor.close()
         conn.close()
         return jsonify({"message": "Candidate not found"}), 404
+
+
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.json
+    username = data.get("username")
+    password = data.get("password")
+
+    if not username or not password:
+        return jsonify({"error": "Please provide both username and password"}), 400
+
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+    user = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if user and check_password_hash(user["password_hash"], password):
+        token = jwt.encode(
+            {
+                "username": user["username"],
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),
+            },
+            app.config["SECRET_KEY"],
+            algorithm="HS256",
+        )
+
+        return jsonify({"token": token}), 200
+    else:
+        return jsonify({"error": "Invalid username or password"}), 401
+
+
+@app.route("/parties", methods=["GET"])
+def get_parties():
+    try:
+        conn = mysql.connector.connect(**db_config)
+        if conn.is_connected():
+            cursor = conn.cursor(dictionary=True)
+
+            # SQL query
+            query = """
+            SELECT * FROM `parties`;
+            """
+
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            return jsonify(rows)
+        else:
+            return jsonify({"error": "Database connection failed"}), 500
+    except Error as e:
+        current_app.logger.error(f"Database error: {e}")
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if "cursor" in locals():
+            cursor.close()
+        if "conn" in locals() and conn.is_connected():
+            conn.close()
+
+
+@app.route("/constituencies", methods=["GET"])
+def get_constituencies():
+    try:
+        conn = mysql.connector.connect(**db_config)
+        if conn.is_connected():
+            cursor = conn.cursor(dictionary=True)
+
+            # SQL query
+            query = """
+            SELECT * FROM `constituencies`;
+            """
+
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            return jsonify(rows)
+        else:
+            return jsonify({"error": "Database connection failed"}), 500
+    except Error as e:
+        current_app.logger.error(f"Database error: {e}")
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if "cursor" in locals():
+            cursor.close()
+        if "conn" in locals() and conn.is_connected():
+            conn.close()
+
+
+@app.route("/add-candidate", methods=["POST"])
+def add_candidate():
+    data = request.json
+    name = data["name"]
+    party_id = data["party_id"]
+    constituency_id = data["constituency_id"]
+
+    try:
+        connection = mysql.connector.connect(**db_config)
+        if connection.is_connected():
+            cursor = connection.cursor()
+            query = """
+            INSERT INTO candidates (name, party_id, constituency_id)
+            VALUES (%s, %s, %s)
+            """
+            values = (name, party_id, constituency_id)
+
+            cursor.execute(query, values)
+            connection.commit()
+
+            return jsonify({"message": "Candidate added successfully!"}), 201
+
+    except Error as e:
+        print("Error while connecting to MySQL", e)
+        return jsonify({"message": "Failed to add candidate"}), 500
+
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+
+    return jsonify({"message": "Unknown error occurred"}), 500
+
+
+@app.route("/candidates/<int:candidate_id>", methods=["DELETE"])
+def delete_candidate(candidate_id):
+    try:
+        conn = mysql.connector.connect(**db_config)
+        if conn.is_connected():
+            cursor = conn.cursor()
+            # Check if candidate exists
+            cursor.execute("SELECT * FROM candidates WHERE id = %s", (candidate_id,))
+            candidate = cursor.fetchone()
+            if candidate:
+                # SQL statement to delete a candidate
+                delete_query = "DELETE FROM candidates WHERE id = %s"
+                cursor.execute(delete_query, (candidate_id,))
+                conn.commit()
+                return jsonify({"message": "Candidate deleted successfully"}), 200
+            else:
+                return jsonify({"message": "Candidate not found"}), 404
+
+    except Error as e:
+        current_app.logger.error(f"Database error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
+
+
+@app.route("/candidates/<int:candidate_id>", methods=["PUT"])
+def update_candidate(candidate_id):
+    data = request.get_json()
+
+    try:
+        # Establish a database connection
+        conn = mysql.connector.connect(**db_config)
+        if conn.is_connected():
+            cursor = conn.cursor()
+
+        # SQL query to update candidate's information
+        update_query = """
+        UPDATE candidates 
+        SET name=%s, party_id=%s, constituency_id=%s, votes=%s
+        WHERE id=%s
+        """
+
+        # Values to update in the candidates table
+        candidate_data = (
+            data["name"],
+            data["party_id"],
+            data["constituency_id"],
+            data["votes"],
+            candidate_id,
+        )
+
+        # Execute the update operation
+        cursor.execute(update_query, candidate_data)
+        conn.commit()
+
+        # Close the cursor and the connection
+        cursor.close()
+        conn.close()
+
+        # Return a success response
+        return (
+            jsonify({"status": "success", "message": "Candidate updated successfully"}),
+            200,
+        )
+
+    except mysql.connector.Error as err:
+        # Handle errors and return an error response
+        return jsonify({"status": "fail", "message": str(err)}), 500
+
+
+@app.route("/add-party", methods=["POST"])
+def add_party():
+    data = request.json
+    alliance = data["alliance"]
+    party = data["party"]
+    symbol = data["symbol"]
+    color = data["color"]
+    try:
+        connection = mysql.connector.connect(**db_config)
+        if connection.is_connected():
+            cursor = connection.cursor()
+            query = """
+            INSERT INTO parties (alliance, party, symbol, color)
+            VALUES (%s, %s, %s, %s)
+            """
+            values = (alliance, party, symbol, color)
+
+            cursor.execute(query, values)
+            connection.commit()
+
+            return jsonify({"message": "Party added successfully!"}), 201
+
+    except Error as e:
+        print("Error while connecting to MySQL", e)
+        return jsonify({"message": "Failed to add Party"}), 500
+
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+
+    return jsonify({"message": "Unknown error occurred"}), 500
+
+
+@app.route("/parties/<int:party_id>", methods=["DELETE"])
+def delete_party(party_id):
+    try:
+        conn = mysql.connector.connect(**db_config)
+        if conn.is_connected():
+            cursor = conn.cursor()
+            # Check if party exists
+            cursor.execute("SELECT * FROM parties WHERE party_id = %s", (party_id,))
+            party = cursor.fetchone()
+            if party:
+                # SQL statement to delete a party
+                delete_query = "DELETE FROM parties WHERE party_id = %s"
+                cursor.execute(delete_query, (party_id,))
+                conn.commit()
+                return jsonify({"message": "Party deleted successfully"}), 200
+            else:
+                return jsonify({"message": "Party not found"}), 404
+
+    except Error as e:
+        current_app.logger.error(f"Database error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
+
+
+@app.route("/parties/<int:party_id>", methods=["PUT"])
+def update_party(party_id):
+    data = request.get_json()
+
+    try:
+        # Establish a database connection
+        conn = mysql.connector.connect(**db_config)
+        if conn.is_connected():
+            cursor = conn.cursor()
+
+        # SQL query to update candidate's information
+        update_query = """
+        UPDATE parties 
+        SET alliance=%s, party=%s, symbol=%s, color=%s
+        WHERE party_id=%s
+        """
+
+        # Values to update in the parties table
+        party_data = (
+            data["alliance"],
+            data["party"],
+            data["symbol"],
+            data["color"],
+            party_id,
+        )
+
+        # Execute the update operation
+        cursor.execute(update_query, party_data)
+        conn.commit()
+
+        # Close the cursor and the connection
+        cursor.close()
+        conn.close()
+
+        # Return a success response
+        return (
+            jsonify({"status": "success", "message": "Party updated successfully"}),
+            200,
+        )
+
+    except mysql.connector.Error as err:
+        # Handle errors and return an error response
+        return jsonify({"status": "fail", "message": str(err)}), 500
 
 
 if __name__ == "__main__":
