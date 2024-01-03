@@ -25,6 +25,7 @@ import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import { Bar } from "react-chartjs-2";
 import "leaflet-boundary-canvas";
+import MuiToolTip from "@mui/material/Tooltip";
 
 import {
   Chart as ChartJS,
@@ -177,7 +178,13 @@ const CandidateDetailsTable = ({
                 {row.CandidateName}
               </TableCell>
               <TableCell style={{ color: "white" }} align="right">
-                {row.Party}
+                <MuiToolTip title={row.PartyName}>
+                  <span
+                    style={{ textDecoration: "underline", cursor: "pointer" }}
+                  >
+                    {row.Party}
+                  </span>
+                </MuiToolTip>
               </TableCell>
               <TableCell style={{ color: "white" }} align="right">
                 <Checkbox
@@ -280,7 +287,7 @@ const VotePercentageBarChart = React.memo(({ votePercentages }) => {
           ctx.font = `${fontSize}px Arial`;
 
           // Retrieve the party name from the dataset
-          const partyName = dataset.party;
+          const partyName = dataset.label;
 
           // For horizontal centering, use the center of the bar's width
           const xPos = bar.getCenterPoint().x;
@@ -298,14 +305,14 @@ const VotePercentageBarChart = React.memo(({ votePercentages }) => {
   };
 
   const datasets = votePercentages.map((item) => ({
-    label: "Percentage",
+    label: item.Party,
     data: [((item.Votes / totalVotes) * 100).toFixed(2)],
     backgroundColor: item.color,
-    party: item.Party,
+    // party: item.Party,
   }));
 
   const data = {
-    labels: ["Election Candidates"],
+    labels: ["Winning Projection"],
     datasets,
   };
 
