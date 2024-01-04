@@ -5,6 +5,7 @@ from flask_cors import CORS
 import jwt
 import datetime
 from werkzeug.security import check_password_hash
+import hashlib
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "n1[S(Jc]G]}36$A|[PRv1XtMk~b-(uWG"
@@ -184,11 +185,32 @@ def election_data():
 @app.route("/submit_vote", methods=["POST"])
 def submit_vote():
     data = request.get_json()
-    candidate_id = data.get("candidateId")  # Changed to candidateId
+    candidate_id = data.get("candidateId")
+    user_agent = request.headers.get("User-Agent")
+    user_ip = request.remote_addr  # Gets the IP address
+
+    # Create a unique string and hash it
+    unique_string = f"{user_ip}-{user_agent}"
+    vote_hash = hashlib.sha256(unique_string.encode()).hexdigest()
 
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
 
+    # Check if hash already exists
+    cursor.execute("SELECT * FROM votes WHERE vote_hash = %s", (vote_hash,))
+    if cursor.fetchone():
+        cursor.close()
+        conn.close()
+        return (
+            jsonify(
+                {
+                    "message": "Vote already recorded. Only one vote per user is permitted."
+                }
+            ),
+            403,
+        )
+
+    # Continue with voting logic if no duplicate found
     cursor.execute("SELECT * FROM candidates WHERE id = %s", (candidate_id,))
     candidate = cursor.fetchone()
 
@@ -196,8 +218,10 @@ def submit_vote():
         new_votes = candidate["votes"] + 1
         cursor.execute(
             "UPDATE candidates SET votes = %s WHERE id = %s",
-            (new_votes, candidate_id),  # Changed to update by ID
+            (new_votes, candidate_id),
         )
+        # Insert vote hash to track
+        cursor.execute("INSERT INTO votes (vote_hash) VALUES (%s)", (vote_hash,))
         conn.commit()
         cursor.close()
         conn.close()

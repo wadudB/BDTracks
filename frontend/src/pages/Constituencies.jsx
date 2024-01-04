@@ -99,8 +99,10 @@ const CandidateDetailsTable = ({
   };
 
   const handleVote = async (candidateId) => {
+    const userAgent = navigator.userAgent;
     const voteData = {
-      candidateId: candidateId,
+      candidateId,
+      userAgent,
     };
 
     try {
@@ -121,7 +123,7 @@ const CandidateDetailsTable = ({
 
       setSnackbarInfo({
         open: true,
-        message: "Vote added successfully!",
+        message: "Vote added, Thank you for your participation!",
         severity: "success",
       });
       // Call the passed fetchElectionData function to refresh data
@@ -139,10 +141,10 @@ const CandidateDetailsTable = ({
     <TableContainer component={Paper} sx={{ mt: 2 }}>
       <Snackbar
         open={snackbarInfo.open}
-        autoHideDuration={5000} // Hide after 5 seconds
+        autoHideDuration={7000} // Hide after 7 seconds
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        sx={{ width: "100%" }}
+        sx={{ width: "100%", textAlign: "center" }}
       >
         <Alert onClose={handleCloseSnackbar} severity={snackbarInfo.severity}>
           {snackbarInfo.message}
@@ -540,7 +542,6 @@ const Constituencies = () => {
           Total Participants in Poll: {totalVotes}
         </Typography>
       </Box>
-
       <div className="my-5">
         <Divider variant="fullwidth" sx={{ borderColor: "#ffffff" }} />
       </div>
