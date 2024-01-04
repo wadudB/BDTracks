@@ -15,7 +15,7 @@ db_config = {
     "host": "localhost",
     "user": "root",
     "password": "",
-    "database": "bd_tracks",
+    "database": "bdtracks_accidents",
 }
 
 

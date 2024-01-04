@@ -26,10 +26,10 @@ ChartJS.register(
 const PartyGrid = ({ leadingParties }) => {
   const partiesArray = Object.values(leadingParties);
   const constituencyWinsByParty = partiesArray.reduce(
-    (accumulator, { Party, Color }) => {
+    (accumulator, { Party, Color, PartyName }) => {
       if (Party) {
         if (!accumulator[Party]) {
-          accumulator[Party] = { count: 0, color: Color };
+          accumulator[Party] = { count: 0, color: Color, partyName: PartyName };
         }
         accumulator[Party].count += 1;
       }
@@ -42,6 +42,13 @@ const PartyGrid = ({ leadingParties }) => {
     indexAxis: "y",
     responsive: true,
     plugins: {
+      tooltip: {
+        callbacks: {
+          title: function () {
+            return "";
+          },
+        },
+      },
       legend: {
         display: false,
       },
@@ -75,6 +82,7 @@ const PartyGrid = ({ leadingParties }) => {
       },
     },
   };
+
   const barTextPlugin = {
     id: "barTextPlugin",
     afterDatasetsDraw(chart) {
@@ -106,9 +114,8 @@ const PartyGrid = ({ leadingParties }) => {
       });
     },
   };
-
   const datasets = Object.keys(constituencyWinsByParty).map((party) => ({
-    label: party,
+    label: [constituencyWinsByParty[party].partyName],
     data: [constituencyWinsByParty[party].count],
     backgroundColor: constituencyWinsByParty[party].color,
     party: party,

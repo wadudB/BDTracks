@@ -26,7 +26,6 @@ import Snackbar from "@mui/material/Snackbar";
 import { Bar } from "react-chartjs-2";
 import "leaflet-boundary-canvas";
 import MuiToolTip from "@mui/material/Tooltip";
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -178,7 +177,11 @@ const CandidateDetailsTable = ({
                 {row.CandidateName}
               </TableCell>
               <TableCell style={{ color: "white" }} align="right">
-                <MuiToolTip title={row.PartyName}>
+                <MuiToolTip
+                  title={row.PartyName}
+                  enterTouchDelay={0}
+                  leaveTouchDelay={3000}
+                >
                   <span
                     style={{ textDecoration: "underline", cursor: "pointer" }}
                   >
@@ -260,6 +263,7 @@ const VotePercentageBarChart = React.memo(({ votePercentages }) => {
       x: {
         stacked: true,
         display: false,
+        max: 100,
         ticks: {
           callback: function (value) {
             return `${value}%`;
@@ -344,7 +348,7 @@ const Constituencies = () => {
   const [electionData, setElectionData] = useState([]);
   const [selectedCandidates, setSelectedCandidates] = useState({});
   const [leadingParties, setLeadingParties] = useState({});
-
+  const [totalVotes, setTotalVotes] = useState(0);
   const mapHeight = isSmallScreen ? "60vh" : "130vh";
   const defaultZoom = isSmallScreen ? 7.8 : 8;
 
@@ -379,8 +383,11 @@ const Constituencies = () => {
 
   const getLeadingPartyByConstituency = (electionData) => {
     const leadingParties = {};
+    let totalVotesAllConstituencies = 0;
 
     electionData.forEach((data) => {
+      totalVotesAllConstituencies += data.Votes;
+
       // Initialize if not present
       if (!leadingParties[data.ConstituencyID]) {
         leadingParties[data.ConstituencyID] = {
@@ -399,11 +406,11 @@ const Constituencies = () => {
           Party: data.Party,
           Votes: data.Votes,
           Color: data.color,
+          PartyName: data.PartyName,
         };
       }
     });
-
-    return leadingParties;
+    return { leadingParties, totalVotesAllConstituencies };
   };
 
   // Find election data for the current feature
@@ -422,8 +429,10 @@ const Constituencies = () => {
 
   // Compute Leading Parties
   useEffect(() => {
-    const newLeadingParties = getLeadingPartyByConstituency(electionData);
-    setLeadingParties(newLeadingParties);
+    const { leadingParties, totalVotesAllConstituencies } =
+      getLeadingPartyByConstituency(electionData);
+    setLeadingParties(leadingParties);
+    setTotalVotes(totalVotesAllConstituencies);
   }, [electionData]);
 
   // Fetch geojsonData
@@ -481,27 +490,57 @@ const Constituencies = () => {
       className="container mx-auto pt-7 mb-5"
       style={{ maxWidth: isSmallScreen ? "88%" : "85%" }}
     >
-      <div
-        style={{
+      <Box
+        sx={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          flexDirection: {
+            xs: "column",
+            md: "row",
+          },
+          justifyContent: {
+            md: "space-between",
+          },
+          alignItems: {
+            md: "center",
+          },
         }}
       >
         <Typography
           variant="h4"
-          className="mb-4"
           sx={{
             fontSize: {
               xs: "1.88rem",
               sm: "1.88rem",
               md: "2.125rem",
             },
+            mb: {
+              xs: 2,
+              md: 0,
+            },
+            flexGrow: {
+              md: 1,
+            },
           }}
         >
-          2024 Bangladeshi general election Constituencies & Candidates
+          2024 Bangladeshi General Election Survey
         </Typography>
-      </div>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            // textAlign: {
+            //   xs: "right", // Center-aligned text for xs
+            //   md: "right", // Right-aligned text for md and upwards
+            // },
+            width: {
+              xs: "100%",
+              md: "auto",
+            },
+          }}
+        >
+          Total Participants in Poll: {totalVotes}
+        </Typography>
+      </Box>
+
       <div className="my-5">
         <Divider variant="fullwidth" sx={{ borderColor: "#ffffff" }} />
       </div>
@@ -511,7 +550,7 @@ const Constituencies = () => {
             variant={isSmallScreen ? "subtitle1" : "h6"}
             className={`!mb-4 ${isSmallScreen ? "!text-sm" : "!text-lg"}`}
           >
-            Constituency projections
+            Constituency Wining projection
           </Typography>
           {Object.keys(leadingParties).length > 0 && (
             <PartyGrid leadingParties={leadingParties} />

@@ -24,22 +24,7 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-// const getColorForParty = (party) => {
-//   // Return color based on party
-//   switch (party) {
-//     case "AL":
-//       return "#006a4e";
-//     case "JP(E)":
-//       return "#F6F600";
-//     case "Independent":
-//       return "#DCDCDC";
-//     case "KSJL":
-//       return "#B58C33";
-//     // Add more parties and their colors as needed
-//     default:
-//       return "#485147"; // Default color
-//   }
-// };
+
 const MapLogicComponent = ({ geojsonData, onAreaClick, leadingParties }) => {
   const map = useMap();
 
