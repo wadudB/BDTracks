@@ -6,8 +6,22 @@ import {
   TableHead,
   TableRow,
   Paper,
+  tableCellClasses,
 } from "@mui/material";
 import PropTypes from "prop-types";
+import { styled } from "@mui/material/styles";
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: "#141d33",
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+    color: "white",
+    backgroundColor: "#202940",
+  },
+}));
 
 const LatestAccidents = ({ latestAccidentData }) => {
   const cellStyle = { color: "white" };
@@ -53,22 +67,22 @@ const LatestAccidents = ({ latestAccidentData }) => {
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell sx={cellStyle}>Date Time (BDT)</TableCell>
-            <TableCell sx={cellStyle} align="right">
+            <StyledTableCell sx={cellStyle}>Date Time (BDT)</StyledTableCell>
+            <StyledTableCell sx={cellStyle} align="right">
               Injured
-            </TableCell>
-            <TableCell sx={cellStyle} align="right">
+            </StyledTableCell>
+            <StyledTableCell sx={cellStyle} align="right">
               Killed
-            </TableCell>
-            <TableCell sx={cellStyle} align="right">
+            </StyledTableCell>
+            <StyledTableCell sx={cellStyle} align="right">
               Location
-            </TableCell>
-            <TableCell sx={cellStyle} align="right">
+            </StyledTableCell>
+            <StyledTableCell sx={cellStyle} align="right">
               District
-            </TableCell>
-            <TableCell sx={cellStyle} align="right">
+            </StyledTableCell>
+            <StyledTableCell sx={cellStyle} align="right">
               Accident Type
-            </TableCell>
+            </StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>

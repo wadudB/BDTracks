@@ -32,9 +32,7 @@ const Dashboard = () => {
   const [totalDeaths, setTotalDeaths] = useState(0);
   const [totalInjured, setTotalInjured] = useState(0);
   const [highestAccidentLocation, setHighestAccidentLocation] = useState("");
-  const [selectedYear, setSelectedYear] = useState(
-    new Date().getFullYear() - 1
-  );
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [dailyDeaths, setDailyDeaths] = useState({});
   const [dailyInjured, setDailyInjured] = useState({});
   const [monthlyDeaths, setMonthlyDeaths] = useState({});
@@ -349,7 +347,7 @@ const Dashboard = () => {
         <Grid2 xs={12} container spacing={2}>
           <Grid2 xs={12} md={12}>
             <DashboardPaper>
-              <Typography variant="subtitle2" className="!text-lg">
+              <Typography variant="subtitle2" className="!text-lg !mb-2">
                 Recent Accident Reports
               </Typography>
               <LatestAccidents latestAccidentData={latestAccidentData} />

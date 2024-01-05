@@ -3,6 +3,7 @@ import "../css/leaflet.css";
 import { Bar } from "react-chartjs-2";
 import "leaflet-boundary-canvas";
 import PropTypes from "prop-types";
+import React from "react";
 
 import {
   Chart as ChartJS,
@@ -23,7 +24,7 @@ ChartJS.register(
   Legend
 );
 
-const PartyGrid = ({ leadingParties }) => {
+const PartyGrid = React.memo(({ leadingParties }) => {
   const partiesArray = Object.values(leadingParties);
   const constituencyWinsByParty = partiesArray.reduce(
     (accumulator, { Party, Color, PartyName }) => {
@@ -129,7 +130,8 @@ const PartyGrid = ({ leadingParties }) => {
   return (
     <Bar options={options} data={data} height="30%" plugins={[barTextPlugin]} />
   );
-};
+});
+PartyGrid.displayName = "PartyGrid";
 
 PartyGrid.propTypes = {
   leadingParties: PropTypes.object.isRequired,

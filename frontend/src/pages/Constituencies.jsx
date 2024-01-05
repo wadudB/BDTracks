@@ -138,7 +138,14 @@ const CandidateDetailsTable = ({
   };
 
   return (
-    <TableContainer component={Paper} sx={{ mt: 2 }}>
+    <TableContainer
+      component={Paper}
+      sx={{
+        mt: 2,
+        maxHeight: "440px", // Set a fixed height
+        overflow: "auto",
+      }}
+    >
       <Snackbar
         open={snackbarInfo.open}
         autoHideDuration={7000} // Hide after 7 seconds
@@ -567,11 +574,12 @@ const Constituencies = () => {
             Click on the Constituency to see details
           </Typography>
           <MapContainer
+            attributionControl={false}
             center={[23.685, 90.3563]}
             // zoom={defaultZoom}
             style={{ height: mapHeight, width: "100%", borderRadius: "8px" }}
             minZoom={defaultZoom}
-            maxZoom={11}
+            maxZoom={11.5}
           >
             {geojsonData && (
               <MapLogicComponent
