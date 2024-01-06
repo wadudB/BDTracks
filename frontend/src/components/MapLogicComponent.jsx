@@ -1,30 +1,8 @@
 import { useEffect } from "react";
 import { GeoJSON, useMap } from "react-leaflet";
 import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import "../css/leaflet.css";
 import PropTypes from "prop-types";
-import "leaflet-boundary-canvas";
 import useMediaQuery from "@mui/material/useMediaQuery";
-
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
 
 const MapLogicComponent = ({ geojsonData, onAreaClick, leadingParties }) => {
   const map = useMap();
