@@ -4,6 +4,7 @@ import {
   Modal,
   Divider,
   Unstable_Grid2 as Grid2,
+  CircularProgress,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -30,6 +31,7 @@ const Constituencies = () => {
   const [totalVotes, setTotalVotes] = useState(0);
   const mapHeight = isSmallScreen ? "65vh" : "130vh";
   const defaultZoom = isSmallScreen ? 7.2 : 8;
+  const [mapLoading, setMapLoading] = useState(true);
 
   const modalStyle = {
     position: "absolute",
@@ -246,6 +248,16 @@ const Constituencies = () => {
           >
             Click on the Constituency to see details
           </Typography>
+          {mapLoading && (
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height="85vh"
+            >
+              <CircularProgress />
+            </Box>
+          )}
           <MapContainer
             attributionControl={false}
             center={[23.685, 90.3563]}
@@ -253,6 +265,7 @@ const Constituencies = () => {
             style={{ height: mapHeight, width: "100%", borderRadius: "8px" }}
             minZoom={defaultZoom}
             maxZoom={11.5}
+            whenReady={() => setMapLoading(false)}
           >
             {geojsonData && (
               <MapLogicComponent
@@ -264,6 +277,7 @@ const Constituencies = () => {
           </MapContainer>
         </DashboardPaper>
       </Grid2>
+
       <Modal
         open={modalOpen}
         onClose={handleCloseModal}

@@ -48,6 +48,21 @@ const VotePercentageBarChart = React.memo(({ votePercentages }) => {
           return context.chart.data.labels[context.dataIndex];
         },
       },
+      tooltip: {
+        // Customizing tooltip
+        callbacks: {
+          label: function (context) {
+            let label = context.dataset.label || "";
+            if (label) {
+              label += ": ";
+            }
+            if (context.parsed.x !== null) {
+              label += context.parsed.x + "%";
+            }
+            return label;
+          },
+        },
+      },
     },
     scales: {
       x: {
