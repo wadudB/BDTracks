@@ -296,7 +296,10 @@ const Constituencies = () => {
               <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                 Constituency Name: {currentFeature.properties.cst_n}
               </Typography>
-              <VotePercentageBarChart votePercentages={votePercentages} />
+              <VotePercentageBarChart
+                votePercentages={votePercentages}
+                isSmallScreen={isSmallScreen}
+              />
               <CandidateDetailsTable
                 data={
                   currentFeature
