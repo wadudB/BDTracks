@@ -24,7 +24,7 @@ ChartJS.register(
   Legend
 );
 
-const PartyGrid = React.memo(({ leadingParties }) => {
+const PartyGrid = React.memo(({ leadingParties, isSmallScreen }) => {
   const partiesArray = Object.values(leadingParties);
   const constituencyWinsByParty = partiesArray.reduce(
     (accumulator, { Party, Color, PartyName }) => {
@@ -128,13 +128,19 @@ const PartyGrid = React.memo(({ leadingParties }) => {
   };
 
   return (
-    <Bar options={options} data={data} height="30%" plugins={[barTextPlugin]} />
+    <Bar
+      options={options}
+      data={data}
+      height={isSmallScreen ? "50%" : "30%"}
+      plugins={[barTextPlugin]}
+    />
   );
 });
 PartyGrid.displayName = "PartyGrid";
 
 PartyGrid.propTypes = {
   leadingParties: PropTypes.object.isRequired,
+  isSmallScreen: PropTypes.bool.isRequired,
 };
 
 export default PartyGrid;
