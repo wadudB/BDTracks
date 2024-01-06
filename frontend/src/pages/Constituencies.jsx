@@ -358,8 +358,8 @@ const Constituencies = () => {
   const [selectedCandidates, setSelectedCandidates] = useState({});
   const [leadingParties, setLeadingParties] = useState({});
   const [totalVotes, setTotalVotes] = useState(0);
-  const mapHeight = isSmallScreen ? "60vh" : "130vh";
-  const defaultZoom = isSmallScreen ? 7.8 : 8;
+  const mapHeight = isSmallScreen ? "65vh" : "130vh";
+  const defaultZoom = isSmallScreen ? 7.2 : 8;
 
   const modalStyle = {
     position: "absolute",
@@ -497,7 +497,7 @@ const Constituencies = () => {
   return (
     <Box
       className="container mx-auto pt-7 mb-5"
-      style={{ maxWidth: isSmallScreen ? "88%" : "85%" }}
+      style={{ maxWidth: isSmallScreen ? "92%" : "85%" }}
     >
       <Box
         sx={{

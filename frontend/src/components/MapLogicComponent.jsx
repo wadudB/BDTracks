@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import "../css/leaflet.css";
 import PropTypes from "prop-types";
 import "leaflet-boundary-canvas";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 import {
   Chart as ChartJS,
@@ -27,6 +28,7 @@ ChartJS.register(
 
 const MapLogicComponent = ({ geojsonData, onAreaClick, leadingParties }) => {
   const map = useMap();
+  const isSmallScreen = useMediaQuery("(max-width: 600px)"); // Define your screen size threshold
 
   useEffect(() => {
     if (!geojsonData) {
@@ -48,6 +50,9 @@ const MapLogicComponent = ({ geojsonData, onAreaClick, leadingParties }) => {
       map.addLayer(osm);
       const ukLayer = L.geoJSON(geojsonData);
       map.fitBounds(ukLayer.getBounds());
+    }
+    if (isSmallScreen) {
+      return;
     }
     // Logic for creating constituency labels
     const markers = geojsonData.features.map((feature) => {
@@ -77,7 +82,7 @@ const MapLogicComponent = ({ geojsonData, onAreaClick, leadingParties }) => {
         }
       }
     };
-  }, [geojsonData]);
+  }, [geojsonData, isSmallScreen]);
 
   return (
     <GeoJSON

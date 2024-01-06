@@ -58,7 +58,7 @@ const Navbar = () => {
     background: "linear-gradient(to right, #1E293B, #182034,  #1E293B)",
     mx: "auto",
     mt: 2,
-    maxWidth: isSmallScreen ? "88%" : "85%",
+    maxWidth: isSmallScreen ? "92%" : "85%",
     borderRadius: "8px",
   };
 

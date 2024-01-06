@@ -139,7 +139,7 @@ const Dashboard = () => {
   return (
     <Box
       className="container mx-auto pt-7 mb-5"
-      style={{ maxWidth: isSmallScreen ? "88%" : "85%" }}
+      style={{ maxWidth: isSmallScreen ? "92%" : "85%" }}
     >
       <div
         style={{
