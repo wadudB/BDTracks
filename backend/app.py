@@ -1,27 +1,34 @@
-from flask import Flask, jsonify, request, current_app
-import mysql.connector
-from mysql.connector import Error
-from flask_cors import CORS
+import os
 import jwt
-import datetime
-from werkzeug.security import check_password_hash
 import hashlib
+import datetime
+import mysql.connector
+from flask_cors import CORS
+from dotenv import load_dotenv
+from mysql.connector import Error
+from scrapingapi.scrapenews import ScrapingApi
+from werkzeug.security import check_password_hash
+from flask import Flask, jsonify, request, current_app
+from CalculateSummary import CalculateSummary
 
+load_dotenv()
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "n1[S(Jc]G]}36$A|[PRv1XtMk~b-(uWG"
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 CORS(app)
 
 # Database configuration
 db_config = {
-    "host": "localhost",
-    "user": "root",
-    "password": "",
-    "database": "bdtracks_accidents",
+    "host": os.getenv("DB_HOST", "localhost"),
+    "user": os.getenv("DB_USER", "root"),
+    "password": os.getenv("DB_PASSWORD", ""),
+    "database": os.getenv("DB_NAME", "bdtracks_accidents"),
 }
 
 
 @app.route("/data", methods=["GET"])
 def get_data():
+    conn = None
+    cursor = None
     try:
         conn = mysql.connector.connect(**db_config)
         if conn.is_connected():
@@ -29,7 +36,7 @@ def get_data():
 
             # SQL query
             query = """
-            SELECT * FROM `accident_summary_2023`;
+            SELECT * FROM `accident_summary_2023` ORDER BY `year`DESC;
             """
 
             cursor.execute(query)
@@ -49,6 +56,8 @@ def get_data():
 
 @app.route("/get_accident_reports", methods=["GET"])
 def get_accident_reports():
+    conn = None
+    cursor = None
     try:
         conn = mysql.connector.connect(**db_config)
         if conn.is_connected():
@@ -106,7 +115,7 @@ def commodity_data():
 def add_commodity():
     # Connect to the database
     conn = mysql.connector.connect(**db_config)
-
+    cursor = None
     # Check if the connection was successful
     if not conn.is_connected():
         return jsonify({"error": "Database connection failed"}), 500
@@ -139,6 +148,8 @@ def add_commodity():
 
 @app.route("/election_data", methods=["GET"])
 def election_data():
+    conn = None
+    cursor = None
     try:
         conn = mysql.connector.connect(**db_config)
         if conn.is_connected():
@@ -268,6 +279,8 @@ def login():
 
 @app.route("/parties", methods=["GET"])
 def get_parties():
+    conn = None
+    cursor = None
     try:
         conn = mysql.connector.connect(**db_config)
         if conn.is_connected():
@@ -295,6 +308,8 @@ def get_parties():
 
 @app.route("/constituencies", methods=["GET"])
 def get_constituencies():
+    conn = None
+    cursor = None
     try:
         conn = mysql.connector.connect(**db_config)
         if conn.is_connected():
@@ -326,7 +341,8 @@ def add_candidate():
     name = data["name"]
     party_id = data["party_id"]
     constituency_id = data["constituency_id"]
-
+    cursor = None
+    connection = None
     try:
         connection = mysql.connector.connect(**db_config)
         if connection.is_connected():
@@ -356,6 +372,8 @@ def add_candidate():
 
 @app.route("/candidates/<int:candidate_id>", methods=["DELETE"])
 def delete_candidate(candidate_id):
+    conn = None
+    cursor = None
     try:
         conn = mysql.connector.connect(**db_config)
         if conn.is_connected():
@@ -385,7 +403,7 @@ def delete_candidate(candidate_id):
 @app.route("/candidates/<int:candidate_id>", methods=["PUT"])
 def update_candidate(candidate_id):
     data = request.get_json()
-
+    cursor = None
     try:
         # Establish a database connection
         conn = mysql.connector.connect(**db_config)
@@ -434,6 +452,8 @@ def add_party():
     party = data["party"]
     symbol = data["symbol"]
     color = data["color"]
+    cursor = None
+    connection = None
     try:
         connection = mysql.connector.connect(**db_config)
         if connection.is_connected():
@@ -463,6 +483,8 @@ def add_party():
 
 @app.route("/parties/<int:party_id>", methods=["DELETE"])
 def delete_party(party_id):
+    conn = None
+    cursor = None
     try:
         conn = mysql.connector.connect(**db_config)
         if conn.is_connected():
@@ -492,7 +514,7 @@ def delete_party(party_id):
 @app.route("/parties/<int:party_id>", methods=["PUT"])
 def update_party(party_id):
     data = request.get_json()
-
+    cursor = None
     try:
         # Establish a database connection
         conn = mysql.connector.connect(**db_config)
@@ -532,6 +554,20 @@ def update_party(party_id):
     except mysql.connector.Error as err:
         # Handle errors and return an error response
         return jsonify({"status": "fail", "message": str(err)}), 500
+
+
+@app.route("/scrape-daily-accident-data", methods=["GET"])
+def scrape_daily_accident_data():
+    try:
+        api = ScrapingApi()
+        get_data = api.run_scraping(db_config)
+        if get_data:
+            calculate_summary = CalculateSummary()
+            summary = calculate_summary.get_summary(db_config)
+        return jsonify({"message": "Success", "summary": summary}), 200
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({"error": "An error occurred"}), 500
 
 
 if __name__ == "__main__":
