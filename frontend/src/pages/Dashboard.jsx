@@ -249,7 +249,7 @@ const Dashboard = () => {
           </Grid2>
           <Grid2 xs={6} md={12} lg={6}>
             <DashboardPaper
-              title="Highest accident location"
+              title="Accident Hotspot"
               statistic={highestAccidentLocation}
               // statisticNote="+20% Since last week"
             />
