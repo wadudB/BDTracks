@@ -13,12 +13,7 @@ import json
 class GPT4Api:
     def gpt4_response(self, df):
         # Initialize
-        # openai.api_key = "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"
-
         openai.api_key = os.environ.get("OPENAPI_KEY")
-
-        # client = OpenAI(api_key="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")
-
         standard_headers = [
             "news_category",
             "id",
