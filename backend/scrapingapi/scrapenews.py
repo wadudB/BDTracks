@@ -103,6 +103,7 @@ class ScrapingApi:
                         print(e)
             except Exception as e:
                 print(f"Error processing page {page_url}: {e}")
+                raise
 
         # Create DataFrame for New Age articles
         newage_df = pd.DataFrame(
@@ -207,6 +208,7 @@ class ScrapingApi:
                         )
             except Exception as e:
                 print(f"Error in article parsing: {e}")
+                raise
 
     # google alerts
     @staticmethod
