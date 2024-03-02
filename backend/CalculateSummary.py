@@ -30,6 +30,16 @@ class CalculateSummary:
         yearly_injured_totals = collections.defaultdict(float)
         yearly_accident_totals = collections.defaultdict(float)
         yearly_location_counts = collections.defaultdict(lambda: collections.Counter())
+        yearly_accidents_by_district = collections.defaultdict(
+            lambda: collections.defaultdict(int)
+        )
+
+        # yearly_killed_by_district = collections.defaultdict(
+        #     lambda: collections.defaultdict(float)
+        # )
+        # yearly_injured_by_district = collections.defaultdict(
+        #     lambda: collections.defaultdict(float)
+        # )
 
         for entry in data:
             # Extract the datetime of the accident
@@ -39,25 +49,28 @@ class CalculateSummary:
             day = accident_date.day
 
             # Convert accidents count to float
-            accident = (
-                float(entry["number_of_accidents_occured"])
-                if entry["number_of_accidents_occured"]
-                else 0.0
-            )
+            accident_count = entry["number_of_accidents_occured"]
+            if accident_count and accident_count.lower() != "unknown":
+                accident = float(accident_count)
+            else:
+                # Handle unknown case here
+                accident = 0.0
 
             # Convert killed count to float
-            killed = (
-                float(entry["total_number_of_people_killed"])
-                if entry["total_number_of_people_killed"]
-                else 0.0
-            )
+            killed_count = entry["total_number_of_people_killed"]
+            if killed_count and killed_count.lower() != "unknown":
+                killed = float(killed_count)
+            else:
+                # Handle unknown case
+                killed = 0.0
 
             # Convert injured count to float
-            injured = (
-                float(entry["total_number_of_people_injured"])
-                if entry["total_number_of_people_injured"]
-                else 0.0
-            )
+            injured_count = entry["total_number_of_people_injured"]
+            if injured_count and injured_count.lower() != "unknown":
+                injured = float(injured_count)
+            else:
+                # Handle unknown case
+                injured = 0.0
 
             vehicles = [
                 entry["primary_vehicle_involved"],
@@ -109,6 +122,16 @@ class CalculateSummary:
 
             # year = entry['accident_datetime_from_url'].year
 
+            district_year = entry["accident_datetime_from_url"].year
+            district_accident = entry["district_of_accident"]
+            if district_accident and "cox" in district_accident.lower():
+                district_accident = "Cox's Bazar"
+            elif district_accident and "cumilla" in district_accident.lower():
+                district_accident = "Comilla"
+            if district_accident:
+                # Assuming 1 accident per entry; adjust logic as needed
+                yearly_accidents_by_district[district_year][district_accident] += 1
+
             for vehicle in vehicles:
                 if vehicle and vehicle != "None":
                     # Check if vehicle is a list and iterate through it, otherwise just add the vehicle
@@ -119,7 +142,26 @@ class CalculateSummary:
                     else:
                         yearly_vehicle_accident_count[year][vehicle] += 1
 
-        print("Yearly Vehicle Accident Counts:", dict(yearly_vehicle_accident_count))
+            # yearly_killed_by_district[year][district] += killed
+            # yearly_injured_by_district[year][district] += injured
+
+            # for year, districts in yearly_killed_by_district.items():
+            #     for district, killed in districts.items():
+            #         # Serialize the district's killed and injured counts
+            #         killed_json = json.dumps(yearly_killed_by_district[year][district])
+            #         injured_json = json.dumps(
+            #             yearly_injured_by_district[year][district]
+            #         )
+
+        # print("Yearly Vehicle Accident Counts:", dict(yearly_vehicle_accident_count))
+        # print(
+        #     "Final yearly killed by district:",
+        #     json.dumps(yearly_killed_by_district, indent=2),
+        # )
+        # print(
+        #     "Final yearly injured by district:",
+        #     json.dumps(yearly_injured_by_district, indent=2),
+        # )
 
         # Now find the most frequent accident location for each year
         most_frequent_locations_per_year = {
@@ -132,11 +174,6 @@ class CalculateSummary:
             most_frequent_locations_per_year,
         )
 
-        # Print or process the calculated totals
-        # print("Daily Totals for Last 30 Days:", daily_totals_last_30_days)
-        # print("Monthly Totals:", monthly_totals)
-        # print("Yearly Totals:", yearly_totals)
-
         # Call the function with your data
         self.upsert_data(
             daily_totals_last_30_days,
@@ -148,6 +185,7 @@ class CalculateSummary:
             yearly_accident_totals,
             most_frequent_locations_per_year,
             yearly_vehicle_accident_count,
+            yearly_accidents_by_district,
             db_config,
         )
 
@@ -208,6 +246,7 @@ class CalculateSummary:
         yearly_accident_totals,
         most_frequent_locations_per_year,
         yearly_vehicle_accident_count,
+        yearly_accidents_by_district,
         db_config,
     ):
         conn = None
@@ -248,13 +287,25 @@ class CalculateSummary:
                     }
                 )
 
+                # New: Serialize district-level killed and injured data
+                # killed_by_district_json = json.dumps(
+                #     yearly_killed_by_district[year], ensure_ascii=False
+                # )
+                # injured_by_district_json = json.dumps(
+                #     yearly_injured_by_district[year], ensure_ascii=False
+                # )
+
+                accidents_by_district_json = json.dumps(
+                    yearly_accidents_by_district[year], ensure_ascii=False
+                )
+
                 # Upsert the data into the database
                 cursor.execute(
                     """
                             INSERT INTO accident_summary_2023 (year, date, total_killed, daily_deaths, 
                             monthly_deaths, total_injured, daily_injured, monthly_injured, last_updated, total_accidents, 
-                            accident_hotspot, vehicles_involved)
-                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                            accident_hotspot, vehicles_involved, accidents_by_district)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                             ON DUPLICATE KEY UPDATE
                             daily_deaths = VALUES(daily_deaths),
                             monthly_deaths = VALUES(monthly_deaths),
@@ -265,7 +316,8 @@ class CalculateSummary:
                             last_updated = VALUES(last_updated),
                             total_accidents = VALUES(total_accidents),
                             accident_hotspot = VALUES(accident_hotspot),
-                            vehicles_involved = VALUES(vehicles_involved)
+                            vehicles_involved = VALUES(vehicles_involved),
+                            accidents_by_district = VALUES(accidents_by_district)
                             """,
                     (
                         year,  # year column
@@ -280,6 +332,7 @@ class CalculateSummary:
                         yearly_accident_totals[year],
                         most_frequent_locations_per_year[year],
                         vehicles_involved_json,
+                        accidents_by_district_json,  # Serialized accidents by district
                     ),
                 )
 
