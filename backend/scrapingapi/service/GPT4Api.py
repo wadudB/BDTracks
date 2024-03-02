@@ -14,6 +14,8 @@ class GPT4Api:
     def gpt4_response(self, df):
         # Initialize
         openai.api_key = os.environ.get("OPENAPI_KEY")
+        final_dataframe = pd.DataFrame()
+
         standard_headers = [
             "news_category",
             "id",

@@ -7,7 +7,9 @@ import {
   TableRow,
   Paper,
   tableCellClasses,
+  TablePagination,
 } from "@mui/material";
+import React from "react";
 import PropTypes from "prop-types";
 import { styled } from "@mui/material/styles";
 
@@ -24,7 +26,18 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const LatestAccidents = ({ latestAccidentData }) => {
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const cellStyle = { color: "white" };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   function removeGMT(datetimeStr) {
     // Assuming the format is something like '2023-03-28 12:00:00 GMT'
@@ -59,60 +72,89 @@ const LatestAccidents = ({ latestAccidentData }) => {
   // };
 
   return (
-    <TableContainer
-      component={Paper}
-      className="shadow-lg"
-      style={{ backgroundColor: "#202940" }}
-    >
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <StyledTableCell sx={cellStyle}>Date Time (BDT)</StyledTableCell>
-            <StyledTableCell sx={cellStyle} align="right">
-              Injured
-            </StyledTableCell>
-            <StyledTableCell sx={cellStyle} align="right">
-              Killed
-            </StyledTableCell>
-            <StyledTableCell sx={cellStyle} align="right">
-              Location
-            </StyledTableCell>
-            <StyledTableCell sx={cellStyle} align="right">
-              District
-            </StyledTableCell>
-            <StyledTableCell sx={cellStyle} align="right">
-              Accident Type
-            </StyledTableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {latestAccidentData.map((row, index) => (
-            <TableRow key={index}>
-              <TableCell sx={cellStyle} component="th" scope="row">
-                {removeGMT(row.accident_datetime_from_url) || "Not Available"}
-              </TableCell>
-              <TableCell sx={cellStyle} align="right">
-                {Math.floor(row.total_number_of_people_injured) ||
-                  "Not Available"}
-              </TableCell>
-              <TableCell sx={cellStyle} align="right">
-                {Math.floor(row.total_number_of_people_killed) ||
-                  "Not Available"}
-              </TableCell>
-              <TableCell sx={cellStyle} align="right">
-                {row.exact_location_of_accident || "Not Available"}
-              </TableCell>
-              <TableCell sx={cellStyle} align="right">
-                {row.district_of_accident || "Not Available"}
-              </TableCell>
-              <TableCell sx={cellStyle} align="right">
-                {row.accident_type || "Not Available"}
-              </TableCell>
+    <>
+      <TableContainer
+        component={Paper}
+        className="shadow-lg"
+        style={{ backgroundColor: "#202940" }}
+      >
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <StyledTableCell sx={cellStyle}>Date Time (BDT)</StyledTableCell>
+              <StyledTableCell sx={cellStyle} align="right">
+                Injured
+              </StyledTableCell>
+              <StyledTableCell sx={cellStyle} align="right">
+                Killed
+              </StyledTableCell>
+              <StyledTableCell sx={cellStyle} align="right">
+                Location
+              </StyledTableCell>
+              <StyledTableCell sx={cellStyle} align="right">
+                District
+              </StyledTableCell>
+              <StyledTableCell sx={cellStyle} align="right">
+                Accident Type
+              </StyledTableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {latestAccidentData
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row, index) => (
+                <TableRow key={index}>
+                  <TableCell sx={cellStyle} component="th" scope="row">
+                    {removeGMT(row.accident_datetime_from_url) ||
+                      "Not Available"}
+                  </TableCell>
+                  <TableCell sx={cellStyle} align="right">
+                    {Math.floor(row.total_number_of_people_injured) ||
+                      "Not Available"}
+                  </TableCell>
+                  <TableCell sx={cellStyle} align="right">
+                    {Math.floor(row.total_number_of_people_killed) ||
+                      "Not Available"}
+                  </TableCell>
+                  <TableCell sx={cellStyle} align="right">
+                    {row.exact_location_of_accident || "Not Available"}
+                  </TableCell>
+                  <TableCell sx={cellStyle} align="right">
+                    {row.district_of_accident || "Not Available"}
+                  </TableCell>
+                  <TableCell sx={cellStyle} align="right">
+                    {row.accident_type || "Not Available"}
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 20]}
+        component="div"
+        count={latestAccidentData.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        sx={{
+          ".MuiTablePagination-toolbar": {
+            color: "white", // Change the pagination toolbar text to white
+          },
+          ".MuiTablePagination-selectLabel, .MuiTablePagination-select, .MuiTablePagination-selectIcon":
+            {
+              color: "white", // Change the select and icon to white
+            },
+          ".MuiTablePagination-displayedRows": {
+            color: "white", // Change the displayed rows text to white
+          },
+          ".MuiTablePagination-actions": {
+            color: "white", // Change the actions navigation arrows to white
+          },
+        }}
+      />
+    </>
   );
 };
 LatestAccidents.propTypes = {

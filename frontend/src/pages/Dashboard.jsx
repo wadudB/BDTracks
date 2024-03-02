@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { Select, MenuItem } from "@mui/material";
@@ -38,6 +38,7 @@ const Dashboard = () => {
   const [monthlyDeaths, setMonthlyDeaths] = useState({});
   const [monthlyInjured, setMonthlyInjured] = useState({});
   const [vehiclesInvolved, setVehiclesInvolved] = useState({});
+  const [accidentsByDistrict, setAccidentsByDistrict] = useState({});
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   // Function to fetch data from Flask API
@@ -73,10 +74,12 @@ const Dashboard = () => {
   useEffect(() => {
     fetchData();
     fetchLatestAccidentData();
-    const geojsonURL = "/bangladesh_geojson_adm2_64_districts_zillas.json";
+    const geojsonURL = "/districts.json";
     fetch(geojsonURL)
       .then((response) => response.json())
-      .then((data) => setGeojsonData(data));
+      .then((data) => {
+        setGeojsonData(data[0].data);
+      });
   }, []);
 
   useEffect(() => {
@@ -84,7 +87,6 @@ const Dashboard = () => {
     const selectedYearData = accidentData.find(
       (item) => item.year === selectedYear
     );
-    // console.log(accidentData);
     if (selectedYearData) {
       // console.log("Selected year: ", selectedYearData);
       // Extract total deaths and total injuries from the selected year data
@@ -97,8 +99,27 @@ const Dashboard = () => {
       setMonthlyDeaths(JSON.parse(selectedYearData.monthly_deaths));
       setMonthlyInjured(JSON.parse(selectedYearData.monthly_injured));
       setVehiclesInvolved(JSON.parse(selectedYearData.vehicles_involved));
+      const parsedAccidentsByDistrict = JSON.parse(
+        selectedYearData.accidents_by_district
+      );
+
+      // District names to lowercase for case-insensitive comparison
+      const lowercaseAccidentsByDistrict = Object.keys(
+        parsedAccidentsByDistrict
+      ).reduce((acc, current) => {
+        const lowercaseKey = current.toLowerCase();
+        acc[lowercaseKey] = parsedAccidentsByDistrict[current];
+        return acc;
+      }, {});
+
+      setAccidentsByDistrict(lowercaseAccidentsByDistrict);
     }
   }, [accidentData, selectedYear]);
+
+  const calculateRadius = (accidentCount) => {
+    const baseRadius = 15;
+    return (Math.sqrt(accidentCount) * baseRadius) / 1.8;
+  };
 
   // Function to extract unique years from the response
   const getUniqueYears = () => {
@@ -114,20 +135,23 @@ const Dashboard = () => {
     setSelectedYear(newYear);
 
     // Filter the data for the selected year
-    const selectedYearData = accidentData.find((item) => item.year === newYear);
+    // const selectedYearData = accidentData.find((item) => item.year === newYear);
 
-    if (selectedYearData) {
-      // console.log("Selected year", selectedYearData);
-      setTotalAccidents(selectedYearData.total_accidents);
-      setTotalDeaths(selectedYearData.total_killed);
-      setTotalInjured(selectedYearData.total_injured);
-      setHighestAccidentLocation(selectedYearData.accident_hotspot);
-      setDailyDeaths(JSON.parse(selectedYearData.daily_deaths));
-      setDailyInjured(JSON.parse(selectedYearData.daily_injured));
-      setMonthlyDeaths(JSON.parse(selectedYearData.monthly_deaths));
-      setMonthlyInjured(JSON.parse(selectedYearData.monthly_injured));
-      setVehiclesInvolved(JSON.parse(selectedYearData.vehicles_involved));
-    }
+    // if (selectedYearData) {
+    //   // console.log("Selected year", selectedYearData);
+    //   setTotalAccidents(selectedYearData.total_accidents);
+    //   setTotalDeaths(selectedYearData.total_killed);
+    //   setTotalInjured(selectedYearData.total_injured);
+    //   setHighestAccidentLocation(selectedYearData.accident_hotspot);
+    //   setDailyDeaths(JSON.parse(selectedYearData.daily_deaths));
+    //   setDailyInjured(JSON.parse(selectedYearData.daily_injured));
+    //   setMonthlyDeaths(JSON.parse(selectedYearData.monthly_deaths));
+    //   setMonthlyInjured(JSON.parse(selectedYearData.monthly_injured));
+    //   setVehiclesInvolved(JSON.parse(selectedYearData.vehicles_involved));
+    //   setAccidentsByDistrict(
+    //     JSON.parse(selectedYearData.accidents_by_district)
+    //   );
+    // }
   };
 
   const handleViewModeChange = (event, nextView) => {
@@ -258,7 +282,7 @@ const Dashboard = () => {
         <Grid2 xs={12} md={7}>
           <DashboardPaper>
             <Typography variant="subtitle2" className="!mb-4 !text-lg">
-              Daily Deaths
+              Daily Casualties (Last 30 days)
             </Typography>
             <LineChart
               dailyDeathsData={dailyDeaths}
@@ -317,25 +341,52 @@ const Dashboard = () => {
           </Grid2>
         </Grid2>
         <Grid2 xs={12} container spacing={2}>
-          <Grid2 xs={12} md={8}>
+          <Grid2 xs={12} md={7.5}>
             <DashboardPaper>
               <Typography variant="subtitle2" className="!mb-4 !text-lg">
-                Real-Time
+                Map View
               </Typography>
               <MapContainer
+                attributionControl={false}
                 center={[23.685, 90.3563]}
                 zoom={7}
-                style={{ height: "400px", width: "100%", borderRadius: "8px" }}
+                style={{ height: "600px", width: "100%", borderRadius: "8px" }}
               >
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-                {geojsonData && <GeoJSON data={geojsonData} />}
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                {geojsonData &&
+                  geojsonData.map((district) => {
+                    const accidentCount =
+                      accidentsByDistrict[district.name.toLowerCase()] || 0;
+                    const radius = calculateRadius(accidentCount);
+                    return (
+                      <CircleMarker
+                        key={district.id}
+                        center={[
+                          parseFloat(district.lat),
+                          parseFloat(district.lon),
+                        ]}
+                        radius={radius}
+                        fillColor="red"
+                        color="black"
+                        weight={2}
+                        opacity={0.6}
+                        fillOpacity={0.5}
+                      >
+                        <Tooltip
+                          direction="right"
+                          offset={[0, 0]}
+                          opacity={1}
+                          permanent={false}
+                        >
+                          {`${district.name}: ${accidentCount} accidents`}
+                        </Tooltip>
+                      </CircleMarker>
+                    );
+                  })}
               </MapContainer>
             </DashboardPaper>
           </Grid2>
-          <Grid2 xs={12} md={4}>
+          <Grid2 xs={12} md={4.5}>
             <DashboardPaper>
               <Typography variant="subtitle2" className="!mb-4 !text-lg">
                 Vehicles Involved

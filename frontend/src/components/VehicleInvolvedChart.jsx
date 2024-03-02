@@ -19,9 +19,9 @@ const useWindowSize = () => {
   return size;
 };
 
-const VehicleInvolvedChart = ({ vehiclesInvolved, slideIndex }) => {
+const VehicleInvolvedChart = ({ vehiclesInvolved, slideIndex, maxValue }) => {
   const [width] = useWindowSize();
-  const rowsPerSlide = 15;
+  const rowsPerSlide = 18;
   const startRow = slideIndex * rowsPerSlide;
   const endRow = startRow + rowsPerSlide;
 
@@ -30,9 +30,6 @@ const VehicleInvolvedChart = ({ vehiclesInvolved, slideIndex }) => {
     vehicleEntries.sort((a, b) => b[1] - a[1]);
     const vehicleName = vehicleEntries.map((entry) => entry[0]);
     const vehicleCount = vehicleEntries.map((entry) => entry[1]);
-
-    // Slice the data to show only 'rowsToShow' number of rows
-    // Slice the data based on the slide index
     const slicedVehicleName = vehicleName.slice(startRow, endRow);
     const slicedVehicleCount = vehicleCount.slice(startRow, endRow);
 
@@ -60,7 +57,7 @@ const VehicleInvolvedChart = ({ vehiclesInvolved, slideIndex }) => {
         },
       ],
     };
-  }, [vehiclesInvolved, startRow, endRow]); // Add dependencies here
+  }, [vehiclesInvolved, startRow, endRow]);
 
   const options = useMemo(
     () => ({
@@ -72,6 +69,11 @@ const VehicleInvolvedChart = ({ vehiclesInvolved, slideIndex }) => {
         },
       },
       responsive: true,
+      scales: {
+        x: {
+          max: maxValue,
+        },
+      },
       plugins: {
         legend: {
           display: false,
@@ -84,12 +86,12 @@ const VehicleInvolvedChart = ({ vehiclesInvolved, slideIndex }) => {
         },
       },
     }),
-    []
+    [maxValue]
   );
 
   // Adjust the style based on the window size
   const chartStyle = {
-    height: width < 600 ? "400px" : "400px",
+    height: width < 600 ? "600px" : "600px",
     width: "100%",
   };
 
@@ -102,13 +104,14 @@ const VehicleInvolvedChart = ({ vehiclesInvolved, slideIndex }) => {
 
 VehicleInvolvedChart.propTypes = {
   vehiclesInvolved: PropTypes.objectOf(PropTypes.number),
-  slideIndex: PropTypes.number, // Add propType for slideIndex
+  slideIndex: PropTypes.number,
+  maxValue: PropTypes.number.isRequired,
 };
 
-// Carousel component that displays 10 rows of the chart per slide
 const ChartCarousel = ({ vehiclesInvolved }) => {
   const totalRows = Object.keys(vehiclesInvolved).length;
-  const numSlides = Math.ceil(totalRows / 15);
+  const numSlides = Math.ceil(totalRows / 18);
+  const maxValue = Math.max(...Object.values(vehiclesInvolved));
 
   const sliderSettings = {
     dots: true, // Enable bottom dots
@@ -128,8 +131,8 @@ const ChartCarousel = ({ vehiclesInvolved }) => {
         <div key={index}>
           <VehicleInvolvedChart
             vehiclesInvolved={vehiclesInvolved}
-            slideIndex={index} // Pass the slide index here
-            rowsToShow={10}
+            slideIndex={index}
+            maxValue={maxValue}
           />
         </div>
       ))}
