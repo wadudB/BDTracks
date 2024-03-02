@@ -4,17 +4,13 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import HelpCenterIcon from "@mui/icons-material/HelpCenter";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import { styled } from "@mui/material/styles";
 import { Link } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-// const FeedbackForm = React.lazy(() => import("./FeedbackForm"));
 
 const Navbar = () => {
   const theme = useTheme();
@@ -22,28 +18,6 @@ const Navbar = () => {
   const isSmallOrMediumScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  // const [anchorEl, setAnchorEl] = useState(null);
-
-  // const open = Boolean(anchorEl);
-  // const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
-
-  // const handleFeedbackOpen = () => {
-  //   setFeedbackDialogOpen(true);
-  //   handleClose(); // This will close the dropdown menu
-  // };
-
-  // const handleFeedbackClose = () => {
-  //   setFeedbackDialogOpen(false);
-  // };
-
-  // const handleHelpMenu = (event) => {
-  //   setAnchorEl(event.currentTarget);
-  // };
-
-  // const handleClose = () => {
-  //   setAnchorEl(null);
-  // };
-
   const toggleDrawer = (open) => (event) => {
     if (
       event.type === "keydown" &&
@@ -135,51 +109,6 @@ const Navbar = () => {
               <StyledLink to="/">Road Accident Dashboard</StyledLink>
               {/* <StyledLink to="/commodities">Commodities</StyledLink> */}
               <StyledLink to="/election_survey">Election Survey</StyledLink>
-              {/* <IconButton
-                color="inherit"
-                aria-label="help menu"
-                onClick={handleHelpMenu}
-                size="large"
-                sx={{
-                  "&:hover": {
-                    color: "#c77676",
-                  },
-                }}
-              >
-                <HelpCenterIcon />
-              </IconButton>
-              <Menu
-                id="help-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={open}
-                onClose={handleClose}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                sx={{
-                  "& .MuiPaper-root": {
-                    textAlign: "center",
-                    backgroundColor: "#202940",
-                    color: "white",
-                    "&:hover": {
-                      color: "#c77676",
-                    },
-                  },
-                }}
-              >
-                <MenuItem
-                  onClick={handleFeedbackOpen}
-                  sx={{ justifyContent: "flex-end" }}
-                >
-                  Feedback
-                </MenuItem>
-              </Menu> */}
             </div>
           )}
         </Toolbar>
