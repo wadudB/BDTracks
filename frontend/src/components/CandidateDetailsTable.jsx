@@ -159,7 +159,8 @@ const CandidateDetailsTable = ({
                   sx={{ color: "white" }}
                   checked={selectedCandidates[row.CandidateName] || false}
                   onChange={() => handleCheck(row.CandidateName)}
-                  disabled={row.CandidateName === "Nomination Withdrawn"}
+                  // disabled={row.CandidateName === "Nomination Withdrawn"}
+                  disabled={true}
                 />
               </TableCell>
               <TableCell style={{ color: "white" }} align="right">
@@ -167,10 +168,11 @@ const CandidateDetailsTable = ({
                   variant="contained"
                   color="primary"
                   onClick={() => handleVote(row.CandidateId)}
-                  disabled={
-                    !selectedCandidates[row.CandidateName] ||
-                    row.CandidateName === "Nomination Withdrawn"
-                  }
+                  // disabled={
+                  //   !selectedCandidates[row.CandidateName] ||
+                  //   row.CandidateName === "Nomination Withdrawn"
+                  // }
+                  disabled={true}
                 >
                   Vote
                 </CustomButton>
