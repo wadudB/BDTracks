@@ -12,7 +12,7 @@ const DashboardPaper = ({
     <Paper
       className="p-4 flex flex-col justify-between h-full dashboard-paper"
       style={{
-        backgroundColor: "#202940",
+        backgroundColor: "#061434",
         borderRadius: "8px",
         color: "white",
         justifyContent: "center",

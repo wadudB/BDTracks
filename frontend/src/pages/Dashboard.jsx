@@ -200,7 +200,7 @@ const Dashboard = () => {
                 xs: "0.875rem", // smaller font size on extra-small screens
                 sm: "1rem", // default font size on small screens and up
               },
-              backgroundColor: "#202940",
+              backgroundColor: "#061434",
               borderStyle: "solid",
               "& .MuiSelect-select": {
                 // Style for the select input
@@ -218,7 +218,7 @@ const Dashboard = () => {
             MenuProps={{
               PaperProps: {
                 style: {
-                  backgroundColor: "#202940",
+                  backgroundColor: "#061434",
                   color: "white",
                 },
               },

@@ -12,27 +12,27 @@ import PropTypes from "prop-types";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#141d33",
+    backgroundColor: "#060522",
     color: theme.palette.common.white,
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
     color: "white",
-    backgroundColor: "#202940",
+    backgroundColor: "#061434",
   },
 }));
 
 const StyledTableRow = styled(TableRow)(() => ({
   "&:nth-of-type(odd)": {
-    backgroundColor: "#202940",
+    backgroundColor: "#061434",
   },
   "&:nth-of-type(even)": {
     backgroundColor: "#1b263b",
   },
   "&:hover": {
-    backgroundColor: "#141d33",
+    backgroundColor: "#060522",
     "& > .MuiTableCell-root": {
-      backgroundColor: "#141d33",
+      backgroundColor: "#060522",
     },
   },
   // hide last border

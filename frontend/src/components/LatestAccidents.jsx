@@ -15,13 +15,13 @@ import { styled } from "@mui/material/styles";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#141d33",
+    backgroundColor: "#060522",
     color: theme.palette.common.white,
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
     color: "white",
-    backgroundColor: "#202940",
+    backgroundColor: "#061434",
   },
 }));
 
@@ -76,7 +76,7 @@ const LatestAccidents = ({ latestAccidentData }) => {
       <TableContainer
         component={Paper}
         className="shadow-lg"
-        style={{ backgroundColor: "#202940" }}
+        style={{ backgroundColor: "#061434" }}
       >
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>

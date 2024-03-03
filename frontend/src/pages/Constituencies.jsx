@@ -39,7 +39,7 @@ const Constituencies = () => {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: isSmallScreen ? "90%" : 500,
-    bgcolor: "#141d33",
+    bgcolor: "#060522",
     border: "2px solid #000",
     boxShadow: 24,
     p: 2,

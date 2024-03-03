@@ -115,13 +115,13 @@ const CandidateDetailsTable = ({
       </Snackbar>
       <Table
         sx={{
-          backgroundColor: "#202940",
+          backgroundColor: "#061434",
           minWidth: 300,
           border: "1px solid white",
         }}
         aria-label="candidate details table"
       >
-        <TableHead style={{ backgroundColor: "#141d33" }}>
+        <TableHead style={{ backgroundColor: "#060522" }}>
           <TableRow>
             <TableCell style={{ color: "white" }}>Candidate</TableCell>
             <TableCell style={{ color: "white" }} align="right">
