@@ -16,11 +16,11 @@ import { styled } from "@mui/material/styles";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#060522",
-    color: theme.palette.common.white,
+    color: "#CBD5E1",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-    color: "white",
+    color: "#CBD5E1",
     backgroundColor: "#061434",
   },
 }));
@@ -28,7 +28,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 const LatestAccidents = ({ latestAccidentData }) => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const cellStyle = { color: "white" };
+  const cellStyle = { color: "#CBD5E1" };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -140,17 +140,17 @@ const LatestAccidents = ({ latestAccidentData }) => {
         onRowsPerPageChange={handleChangeRowsPerPage}
         sx={{
           ".MuiTablePagination-toolbar": {
-            color: "white", // Change the pagination toolbar text to white
+            color: "#CBD5E1",
           },
           ".MuiTablePagination-selectLabel, .MuiTablePagination-select, .MuiTablePagination-selectIcon":
             {
-              color: "white", // Change the select and icon to white
+              color: "#CBD5E1",
             },
           ".MuiTablePagination-displayedRows": {
-            color: "white", // Change the displayed rows text to white
+            color: "#CBD5E1",
           },
           ".MuiTablePagination-actions": {
-            color: "white", // Change the actions navigation arrows to white
+            color: "#CBD5E1",
           },
         }}
       />

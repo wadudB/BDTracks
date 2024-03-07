@@ -188,6 +188,7 @@ const Commodities = () => {
           variant="h4"
           className="mb-4"
           sx={{
+            color: "#CBD5E1",
             fontSize: {
               xs: "1.88rem",
               sm: "1.88rem",
@@ -201,7 +202,7 @@ const Commodities = () => {
           <Button
             variant="outlined"
             sx={{
-              color: "white",
+              color: "#CBD5E1",
               borderColor: "white",
               "&:hover": {
                 backgroundColor: "#c77676",

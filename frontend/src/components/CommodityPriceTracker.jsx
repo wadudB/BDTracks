@@ -10,14 +10,14 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import PropTypes from "prop-types";
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
+const StyledTableCell = styled(TableCell)(() => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#060522",
-    color: theme.palette.common.white,
+    color: "#CBD5E1",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-    color: "white",
+    color: "#CBD5E1",
     backgroundColor: "#061434",
   },
 }));
@@ -87,17 +87,17 @@ function CommodityPriceTracker({ commodityData }) {
         onRowsPerPageChange={handleChangeRowsPerPage}
         sx={{
           ".MuiTablePagination-toolbar": {
-            color: "white", // Change the pagination toolbar text to white
+            color: "#CBD5E1",
           },
           ".MuiTablePagination-selectLabel, .MuiTablePagination-select, .MuiTablePagination-selectIcon":
             {
-              color: "white", // Change the select and icon to white
+              color: "#CBD5E1",
             },
           ".MuiTablePagination-displayedRows": {
-            color: "white", // Change the displayed rows text to white
+            color: "#CBD5E1",
           },
           ".MuiTablePagination-actions": {
-            color: "white", // Change the actions navigation arrows to white
+            color: "#CBD5E1",
           },
         }}
       />

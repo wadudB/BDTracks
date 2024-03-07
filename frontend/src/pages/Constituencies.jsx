@@ -189,6 +189,7 @@ const Constituencies = () => {
         <Typography
           variant="h4"
           sx={{
+            color: "#CBD5E1",
             fontSize: {
               xs: "1.88rem",
               sm: "1.88rem",
@@ -212,6 +213,7 @@ const Constituencies = () => {
             //   xs: "right", // Center-aligned text for xs
             //   md: "right", // Right-aligned text for md and upwards
             // },
+            color: "#CBD5E1",
             width: {
               xs: "100%",
               md: "auto",

@@ -106,7 +106,7 @@ const VehicleInvolvedChart = ({ vehiclesInvolved, slideIndex, maxValue }) => {
           display: true,
           text: "Vehicle Involvement in Accidents",
           position: "bottom",
-          color: "white",
+          color: "#CBD5E1",
         },
       },
     }),

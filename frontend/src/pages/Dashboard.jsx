@@ -176,6 +176,7 @@ const Dashboard = () => {
           variant="h4"
           className="mb-4"
           sx={{
+            color: "#CBD5E1",
             fontSize: {
               xs: "1.88rem",
               sm: "1.88rem",
@@ -192,7 +193,7 @@ const Dashboard = () => {
             sx={{
               marginLeft: 2,
               width: 100,
-              color: "white",
+              color: "#CBD5E1",
               textAlign: "right",
               borderColor: "white",
               borderWidth: 0.1,
@@ -208,7 +209,7 @@ const Dashboard = () => {
               },
               "& .MuiSvgIcon-root": {
                 // Style for the dropdown icon
-                color: "white",
+                color: "#CBD5E1",
                 fontSize: "1.25rem",
               },
               "&:hover": {
@@ -219,7 +220,7 @@ const Dashboard = () => {
               PaperProps: {
                 style: {
                   backgroundColor: "#061434",
-                  color: "white",
+                  color: "#CBD5E1",
                 },
               },
               sx: {
@@ -232,7 +233,6 @@ const Dashboard = () => {
               },
             }}
           >
-            {/* Menu items */}
             {getUniqueYears().map((year) => (
               <MenuItem
                 key={year}
@@ -313,10 +313,10 @@ const Dashboard = () => {
                     onChange={handleViewModeChange}
                     sx={{
                       "& .MuiToggleButtonGroup-grouped": {
-                        color: "white",
+                        color: "#CBD5E1",
                         backgroundColor: "rgba(255,255,255,0.2)",
                         "&.Mui-selected, &.Mui-selected:hover": {
-                          color: "white",
+                          color: "#CBD5E1",
                           borderColor: "white",
                         },
                         "&:hover": {

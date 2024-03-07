@@ -14,7 +14,7 @@ const DashboardPaper = ({
       style={{
         backgroundColor: "#061434",
         borderRadius: "8px",
-        color: "white",
+        color: "#CBD5E1",
         justifyContent: "center",
       }}
       {...props}
