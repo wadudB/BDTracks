@@ -60,6 +60,9 @@ const Navbar = () => {
     color: "#CBD5E1",
     textDecoration: "none",
     py: 1.5,
+    "&:hover": {
+      color: "#c77676",
+    },
   };
 
   const menuItems = [

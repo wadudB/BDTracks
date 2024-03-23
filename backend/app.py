@@ -70,7 +70,10 @@ def get_accident_reports():
                 `total_number_of_people_injured`, 
                 `total_number_of_people_killed`,
                 `exact_location_of_accident`,
-                `district_of_accident`,`accident_type`
+                `district_of_accident`,
+                `accident_type`,
+                `headline`,
+                `summary`
             FROM `all_accidents_data`
             WHERE `is_country_bangladesh_or_other_country` = "Bangladesh"
             And `is_the_accident_data_yearly_monthly_or_daily` = "daily"

@@ -1,12 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import {
-  Typography,
-  Box,
-  Unstable_Grid2 as Grid2,
-  Divider,
-} from "@mui/material";
+import { Typography, Box, Unstable_Grid2 as Grid2 } from "@mui/material";
 import AboutUs from "../components/AboutUS";
 import FeatureCard from "../components/FeatureCard";
 import ContactForm from "../components/ContactForm ";
@@ -34,7 +29,7 @@ const Home = () => {
     <Box sx={{ mx: "auto", maxWidth: isSmallScreen ? "92%" : "85%" }}>
       <Grid2
         sx={{
-          height: "90vh",
+          height: "95vh",
           backgroundImage: "url(/home2.png)",
           backgroundPosition: "center",
           backgroundSize: "cover",
@@ -106,7 +101,7 @@ const Home = () => {
               sm: "1.88rem",
               md: "2.125rem",
             },
-            mb: 2,
+            mb: 5,
             textAlign: "center",
           }}
         >
@@ -191,7 +186,8 @@ const Home = () => {
               sm: "1.88rem",
               md: "2.125rem",
             },
-            mt: 3,
+            mt: 7,
+            mb: 5,
             textAlign: "center",
           }}
         >
@@ -224,8 +220,8 @@ const Home = () => {
               sm: "1.88rem",
               md: "2.125rem",
             },
-            mt: 3,
-            mb: 2,
+            mt: 7,
+            // mb: 2,
             textAlign: "center",
           }}
         >
@@ -234,12 +230,8 @@ const Home = () => {
         <Typography variant="body1" sx={{ color: "#CBD5E1", mb: 5 }}>
           Get In Touch With Us
         </Typography>
-
         <ContactForm />
       </Box>
-      <div className="my-5">
-        <Divider variant="fullwidth" sx={{ borderColor: "#CBD5E1" }} />
-      </div>
     </Box>
   );
 };

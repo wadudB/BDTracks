@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import { Select, MenuItem } from "@mui/material";
+import { Select, MenuItem, CircularProgress } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import "leaflet/dist/leaflet.css";
@@ -41,9 +41,13 @@ const Dashboard = () => {
   const [accidentsByDistrict, setAccidentsByDistrict] = useState({});
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const [isLoading, setIsLoading] = useState(false); // Added loading state
+  const [error, setError] = useState(null);
+
   // Function to fetch data from Flask API
   const fetchData = async () => {
     try {
+      setIsLoading(true);
       const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
       const response = await fetch(`${apiUrl}/data`);
       if (!response.ok) {
@@ -52,13 +56,16 @@ const Dashboard = () => {
       const jsonData = await response.json();
       setAccidentdata(jsonData);
     } catch (error) {
-      console.error("Error fetching data: ", error);
+      setError(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // Function to fetch data from Flask API
   const fetchLatestAccidentData = async () => {
     try {
+      setIsLoading(true);
       const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
       const response = await fetch(`${apiUrl}/get_accident_reports`);
       if (!response.ok) {
@@ -67,7 +74,9 @@ const Dashboard = () => {
       const jsonData = await response.json();
       setLatestAccidentData(jsonData);
     } catch (error) {
-      console.error("Error fetching data: ", error);
+      setError(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -159,10 +168,21 @@ const Dashboard = () => {
       setViewMode(nextView);
     }
   };
-
+  // Conditional Rendering
+  if (error)
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="85vh"
+      >
+        <p>Error loading data!</p>
+      </Box>
+    );
   return (
     <Box
-      className="container mx-auto pt-7 mb-5"
+      className="container mx-auto pt-7 "
       style={{ maxWidth: isSmallScreen ? "92%" : "85%" }}
     >
       <div
@@ -248,164 +268,179 @@ const Dashboard = () => {
       <div className="my-5">
         <Divider variant="fullwidth" sx={{ borderColor: "#ffffff" }} />
       </div>
-      <Grid2 container spacing={2}>
-        <Grid2 xs={12} md={5} container spacing={2}>
-          <Grid2 xs={6} md={12} lg={6}>
-            <DashboardPaper
-              title="Total Accidents"
-              statistic={totalAccidents.toLocaleString()}
-              // statisticNote="+14% Since last week"
-            />
+      {isLoading ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="85vh"
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Grid2 container spacing={2}>
+          <Grid2 xs={12} md={5} container spacing={2}>
+            <Grid2 xs={6} md={12} lg={6}>
+              <DashboardPaper
+                title="Total Accidents"
+                statistic={totalAccidents.toLocaleString()}
+                // statisticNote="+14% Since last week"
+              />
+            </Grid2>
+            <Grid2 xs={6} md={12} lg={6}>
+              <DashboardPaper
+                title="Total Deaths"
+                statistic={totalDeaths.toLocaleString()}
+                // statisticNote="+8% Since last week"
+              />
+            </Grid2>
+            <Grid2 xs={6} md={12} lg={6}>
+              <DashboardPaper
+                title="Total Injured"
+                statistic={totalInjured.toLocaleString()}
+                // statisticNote="+5% Since last week"
+              />
+            </Grid2>
+            <Grid2 xs={6} md={12} lg={6}>
+              <DashboardPaper
+                title="Accident Hotspot"
+                statistic={highestAccidentLocation}
+                // statisticNote="+20% Since last week"
+              />
+            </Grid2>
           </Grid2>
-          <Grid2 xs={6} md={12} lg={6}>
-            <DashboardPaper
-              title="Total Deaths"
-              statistic={totalDeaths.toLocaleString()}
-              // statisticNote="+8% Since last week"
-            />
-          </Grid2>
-          <Grid2 xs={6} md={12} lg={6}>
-            <DashboardPaper
-              title="Total Injured"
-              statistic={totalInjured.toLocaleString()}
-              // statisticNote="+5% Since last week"
-            />
-          </Grid2>
-          <Grid2 xs={6} md={12} lg={6}>
-            <DashboardPaper
-              title="Accident Hotspot"
-              statistic={highestAccidentLocation}
-              // statisticNote="+20% Since last week"
-            />
-          </Grid2>
-        </Grid2>
-        <Grid2 xs={12} md={7}>
-          <DashboardPaper>
-            <Typography variant="subtitle2" className="!mb-4 !text-lg">
-              Daily Casualties (Last 30 days)
-            </Typography>
-            <LineChart
-              dailyDeathsData={dailyDeaths}
-              dailyInjuredData={dailyInjured}
-            />
-          </DashboardPaper>
-        </Grid2>
-        <Grid2 xs={12} container spacing={2}>
-          <Grid2 xs={12} md={12}>
+          <Grid2 xs={12} md={7}>
             <DashboardPaper>
-              <Grid2
-                container
-                alignItems="center"
-                justifyContent="space-between"
-                spacing={2}
-              >
-                <Grid2 item="true">
-                  <Typography variant="subtitle2" className="!mb-4 !text-lg">
-                    Death / Injured
-                  </Typography>
-                </Grid2>
-                <Grid2 item="true">
-                  <ToggleButtonGroup
-                    size="small"
-                    color="primary"
-                    value={viewMode}
-                    exclusive
-                    onChange={handleViewModeChange}
-                    sx={{
-                      "& .MuiToggleButtonGroup-grouped": {
-                        color: "#CBD5E1",
-                        backgroundColor: "rgba(255,255,255,0.2)",
-                        "&.Mui-selected, &.Mui-selected:hover": {
-                          color: "#CBD5E1",
-                          borderColor: "white",
-                        },
-                        "&:hover": {
-                          color: "#c77676",
-                          borderColor: "white",
-                        },
-                      },
-                    }}
-                  >
-                    <ToggleButton value="monthly">Monthly</ToggleButton>
-                    <ToggleButton value="yearly">Yearly</ToggleButton>
-                  </ToggleButtonGroup>
-                </Grid2>
-              </Grid2>
-              <Chart
-                monthlyInjured={monthlyInjured}
-                monthlyDeaths={monthlyDeaths}
-                accidentData={accidentData}
-                viewMode={viewMode}
+              <Typography variant="subtitle2" className="!mb-4 !text-lg">
+                Daily Casualties (Last 30 days)
+              </Typography>
+              <LineChart
+                dailyDeathsData={dailyDeaths}
+                dailyInjuredData={dailyInjured}
               />
             </DashboardPaper>
           </Grid2>
-        </Grid2>
-        <Grid2 xs={12} container spacing={2}>
-          <Grid2 xs={12} md={7.5}>
-            <DashboardPaper>
-              <Typography variant="subtitle2" className="!mb-4 !text-lg">
-                Map View
-              </Typography>
-              <MapContainer
-                attributionControl={false}
-                center={[23.685, 90.3563]}
-                zoom={7}
-                style={{ height: "600px", width: "100%", borderRadius: "8px" }}
-              >
-                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                {geojsonData &&
-                  geojsonData.map((district) => {
-                    const accidentCount =
-                      accidentsByDistrict[district.name.toLowerCase()] || 0;
-                    const radius = calculateRadius(accidentCount);
-                    return (
-                      <CircleMarker
-                        key={district.id}
-                        center={[
-                          parseFloat(district.lat),
-                          parseFloat(district.lon),
-                        ]}
-                        radius={radius}
-                        fillColor="red"
-                        color="black"
-                        weight={2}
-                        opacity={0.6}
-                        fillOpacity={0.5}
-                      >
-                        <Tooltip
-                          direction="right"
-                          offset={[0, 0]}
-                          opacity={1}
-                          permanent={false}
+          <Grid2 xs={12} container spacing={2}>
+            <Grid2 xs={12} md={12}>
+              <DashboardPaper>
+                <Grid2
+                  container
+                  alignItems="center"
+                  justifyContent="space-between"
+                  spacing={2}
+                >
+                  <Grid2 item="true">
+                    <Typography variant="subtitle2" className="!mb-4 !text-lg">
+                      Death / Injured
+                    </Typography>
+                  </Grid2>
+                  <Grid2 item="true">
+                    <ToggleButtonGroup
+                      size="small"
+                      color="primary"
+                      value={viewMode}
+                      exclusive
+                      onChange={handleViewModeChange}
+                      sx={{
+                        "& .MuiToggleButtonGroup-grouped": {
+                          color: "#CBD5E1",
+                          backgroundColor: "rgba(255,255,255,0.2)",
+                          "&.Mui-selected, &.Mui-selected:hover": {
+                            color: "#CBD5E1",
+                            borderColor: "white",
+                          },
+                          "&:hover": {
+                            color: "#c77676",
+                            borderColor: "white",
+                          },
+                        },
+                      }}
+                    >
+                      <ToggleButton value="monthly">Monthly</ToggleButton>
+                      <ToggleButton value="yearly">Yearly</ToggleButton>
+                    </ToggleButtonGroup>
+                  </Grid2>
+                </Grid2>
+                <Chart
+                  monthlyInjured={monthlyInjured}
+                  monthlyDeaths={monthlyDeaths}
+                  accidentData={accidentData}
+                  viewMode={viewMode}
+                />
+              </DashboardPaper>
+            </Grid2>
+          </Grid2>
+          <Grid2 xs={12} container spacing={2}>
+            <Grid2 xs={12} md={7.5}>
+              <DashboardPaper>
+                <Typography variant="subtitle2" className="!mb-4 !text-lg">
+                  Map View
+                </Typography>
+                <MapContainer
+                  attributionControl={false}
+                  center={[23.685, 90.3563]}
+                  zoom={7}
+                  style={{
+                    height: "600px",
+                    width: "100%",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  {geojsonData &&
+                    geojsonData.map((district) => {
+                      const accidentCount =
+                        accidentsByDistrict[district.name.toLowerCase()] || 0;
+                      const radius = calculateRadius(accidentCount);
+                      return (
+                        <CircleMarker
+                          key={district.id}
+                          center={[
+                            parseFloat(district.lat),
+                            parseFloat(district.lon),
+                          ]}
+                          radius={radius}
+                          fillColor="red"
+                          color="black"
+                          weight={2}
+                          opacity={0.6}
+                          fillOpacity={0.5}
                         >
-                          {`${district.name}: ${accidentCount} accidents`}
-                        </Tooltip>
-                      </CircleMarker>
-                    );
-                  })}
-              </MapContainer>
-            </DashboardPaper>
+                          <Tooltip
+                            direction="right"
+                            offset={[0, 0]}
+                            opacity={1}
+                            permanent={false}
+                          >
+                            {`${district.name}: ${accidentCount} accidents`}
+                          </Tooltip>
+                        </CircleMarker>
+                      );
+                    })}
+                </MapContainer>
+              </DashboardPaper>
+            </Grid2>
+            <Grid2 xs={12} md={4.5}>
+              <DashboardPaper>
+                <Typography variant="subtitle2" className="!mb-4 !text-lg">
+                  Vehicles Involved
+                </Typography>
+                <VehicleInvolvedChart vehiclesInvolved={vehiclesInvolved} />
+              </DashboardPaper>
+            </Grid2>
           </Grid2>
-          <Grid2 xs={12} md={4.5}>
-            <DashboardPaper>
-              <Typography variant="subtitle2" className="!mb-4 !text-lg">
-                Vehicles Involved
-              </Typography>
-              <VehicleInvolvedChart vehiclesInvolved={vehiclesInvolved} />
-            </DashboardPaper>
+          <Grid2 xs={12} container spacing={2}>
+            <Grid2 xs={12} md={12}>
+              <DashboardPaper>
+                <Typography variant="subtitle2" className="!text-lg !mb-2">
+                  Recent Accident Reports
+                </Typography>
+                <LatestAccidents latestAccidentData={latestAccidentData} />
+              </DashboardPaper>
+            </Grid2>
           </Grid2>
         </Grid2>
-        <Grid2 xs={12} container spacing={2}>
-          <Grid2 xs={12} md={12}>
-            <DashboardPaper>
-              <Typography variant="subtitle2" className="!text-lg !mb-2">
-                Recent Accident Reports
-              </Typography>
-              <LatestAccidents latestAccidentData={latestAccidentData} />
-            </DashboardPaper>
-          </Grid2>
-        </Grid2>
-      </Grid2>
+      )}
     </Box>
   );
 };
