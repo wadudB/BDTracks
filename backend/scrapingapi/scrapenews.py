@@ -89,16 +89,22 @@ class ScrapingApi:
 
                 for article in articles:
                     try:
-                        article_url = article.find("h3").find("a")["href"].strip()
-                        if article_url not in existing_urls:
-                            existing_urls.append(article_url)
-                            text, date, title = self.common.extract_article_from_url(
-                                article_url
-                            )
-                            if text and date:
-                                newage_upperframe.append(
-                                    (date, article_url, text, title)
-                                )
+                        article_heading = article.find("h3")
+                        if article_heading:
+                            article_link = article_heading.find("a")
+                            if article_link and "href" in article_link.attrs:
+                                article_url = article_link["href"].strip()
+                                if article_url not in existing_urls:
+                                    existing_urls.append(article_url)
+                                    text, date, title = (
+                                        self.common.extract_article_from_url(
+                                            article_url
+                                        )
+                                    )
+                                    if text and date:
+                                        newage_upperframe.append(
+                                            (date, article_url, text, title)
+                                        )
                     except Exception as e:
                         print(e)
             except Exception as e:
@@ -173,11 +179,18 @@ class ScrapingApi:
         )
         dailystar_df["source"] = "dailystar"
         dailystar_df["accident_datetime_from_url"] = pd.to_datetime(
-            dailystar_df["accident_datetime_from_url"], errors="coerce"
+            dailystar_df["accident_datetime_from_url"],
+            format="%m/%d/%Y %I:%M:%S %p",
+            errors="coerce",
         )
         dailystar_df.sort_values(
             by="accident_datetime_from_url", na_position="last", inplace=True
         )
+        # Status after converting dates to datetime
+        invalid_dates = dailystar_df[
+            pd.isnull(dailystar_df["accident_datetime_from_url"])
+        ]
+        print("Invalid or unparseable dates found:", invalid_dates)
 
         return dailystar_df
 
@@ -413,9 +426,9 @@ class ScrapingApi:
                             if (
                                 similarity_matrix[i][j] > 0.9
                             ):  # Adjust threshold as needed
-                                relevant_df.at[
-                                    daily_articles.index[j], "Duplicate"
-                                ] = True
+                                relevant_df.at[daily_articles.index[j], "Duplicate"] = (
+                                    True
+                                )
 
             # Filter out duplicates
             ultimate_final_df = relevant_df[~relevant_df["Duplicate"]]
