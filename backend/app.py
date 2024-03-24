@@ -70,12 +70,15 @@ def get_accident_reports():
                 `total_number_of_people_injured`, 
                 `total_number_of_people_killed`,
                 `exact_location_of_accident`,
-                `district_of_accident`,`accident_type`
+                `district_of_accident`,
+                `accident_type`,
+                `headline`,
+                `summary`
             FROM `all_accidents_data`
             WHERE `is_country_bangladesh_or_other_country` = "Bangladesh"
             And `is_the_accident_data_yearly_monthly_or_daily` = "daily"
-            AND (`duplicate_check` IS NULL OR `duplicate_check` = '')
-            ORDER BY `accident_datetime_from_url` DESC LIMIT 7;
+            AND `duplicate_check` = 0
+            ORDER BY `accident_datetime_from_url` DESC LIMIT 50;
             """
 
             cursor.execute(query)
@@ -214,11 +217,7 @@ def submit_vote():
         cursor.close()
         conn.close()
         return (
-            jsonify(
-                {
-                    "message": "Vote already recorded. Only one vote per user is permitted."
-                }
-            ),
+            jsonify({"message": "Vote already recorded. Only one vote per user is permitted."}),
             403,
         )
 

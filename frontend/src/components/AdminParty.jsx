@@ -36,27 +36,27 @@ const WhiteTextField = styled(TextField)({
 });
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#141d33",
+    backgroundColor: "#060522",
     color: theme.palette.common.white,
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
     color: "white",
-    backgroundColor: "#202940",
+    backgroundColor: "#061434",
   },
 }));
 
 const StyledTableRow = styled(TableRow)(() => ({
   "&:nth-of-type(odd)": {
-    backgroundColor: "#202940",
+    backgroundColor: "#061434",
   },
   "&:nth-of-type(even)": {
     backgroundColor: "#1b263b",
   },
   "&:hover": {
-    backgroundColor: "#141d33",
+    backgroundColor: "#060522",
     "& > .MuiTableCell-root": {
-      backgroundColor: "#141d33",
+      backgroundColor: "#060522",
     },
   },
   // hide last border
@@ -242,7 +242,7 @@ const AdminParty = ({ setParties, fetchParties, parties }) => {
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: 400,
-            bgcolor: "#141d33",
+            bgcolor: "#060522",
             border: "2px solid #000",
             boxShadow: 24,
             p: 4,

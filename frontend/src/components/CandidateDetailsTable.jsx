@@ -115,22 +115,22 @@ const CandidateDetailsTable = ({
       </Snackbar>
       <Table
         sx={{
-          backgroundColor: "#202940",
+          backgroundColor: "#061434",
           minWidth: 300,
           border: "1px solid white",
         }}
         aria-label="candidate details table"
       >
-        <TableHead style={{ backgroundColor: "#141d33" }}>
+        <TableHead style={{ backgroundColor: "#060522" }}>
           <TableRow>
-            <TableCell style={{ color: "white" }}>Candidate</TableCell>
-            <TableCell style={{ color: "white" }} align="right">
+            <TableCell style={{ color: "#CBD5E1" }}>Candidate</TableCell>
+            <TableCell style={{ color: "#CBD5E1" }} align="right">
               Party
             </TableCell>
-            <TableCell style={{ color: "white" }} align="right">
+            <TableCell style={{ color: "#CBD5E1" }} align="right">
               Select
             </TableCell>
-            <TableCell style={{ color: "white" }} align="right">
+            <TableCell style={{ color: "#CBD5E1" }} align="right">
               Vote
             </TableCell>
           </TableRow>
@@ -138,10 +138,14 @@ const CandidateDetailsTable = ({
         <TableBody>
           {data.map((row, index) => (
             <TableRow key={index}>
-              <TableCell component="th" scope="row" style={{ color: "white" }}>
+              <TableCell
+                component="th"
+                scope="row"
+                style={{ color: "#CBD5E1" }}
+              >
                 {row.CandidateName}
               </TableCell>
-              <TableCell style={{ color: "white" }} align="right">
+              <TableCell style={{ color: "#CBD5E1" }} align="right">
                 <MuiToolTip
                   title={row.PartyName}
                   enterTouchDelay={0}
@@ -154,23 +158,25 @@ const CandidateDetailsTable = ({
                   </span>
                 </MuiToolTip>
               </TableCell>
-              <TableCell style={{ color: "white" }} align="right">
+              <TableCell style={{ color: "#CBD5E1" }} align="right">
                 <Checkbox
-                  sx={{ color: "white" }}
+                  sx={{ color: "#CBD5E1" }}
                   checked={selectedCandidates[row.CandidateName] || false}
                   onChange={() => handleCheck(row.CandidateName)}
-                  disabled={row.CandidateName === "Nomination Withdrawn"}
+                  // disabled={row.CandidateName === "Nomination Withdrawn"}
+                  disabled={true}
                 />
               </TableCell>
-              <TableCell style={{ color: "white" }} align="right">
+              <TableCell style={{ color: "#CBD5E1" }} align="right">
                 <CustomButton
                   variant="contained"
                   color="primary"
                   onClick={() => handleVote(row.CandidateId)}
-                  disabled={
-                    !selectedCandidates[row.CandidateName] ||
-                    row.CandidateName === "Nomination Withdrawn"
-                  }
+                  // disabled={
+                  //   !selectedCandidates[row.CandidateName] ||
+                  //   row.CandidateName === "Nomination Withdrawn"
+                  // }
+                  disabled={true}
                 >
                   Vote
                 </CustomButton>

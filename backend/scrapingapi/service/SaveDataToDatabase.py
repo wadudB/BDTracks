@@ -78,7 +78,7 @@ class SaveDataToDatabase:
                         transaction.commit()
 
                     except Exception as e:
-                        print(f"An error occurred: {e}")
+                        print(f"An error occurred while saving: {e}")
                         # Rollback the transaction in case of error
                         transaction.rollback()
                         raise

@@ -31,9 +31,7 @@ class ScrapingApi:
             dailystar_df = self.scrape_daily_star(existing_urls)
 
             # Get latest news form google alerts
-            filtered_new_data = self.process_google_alerts(
-                db_data, newage_df, dailystar_df
-            )
+            filtered_new_data = self.process_google_alerts(db_data, newage_df, dailystar_df)
             # Combine all news
             combined_df = self.merge_and_process_dataframes(
                 existing_urls, newage_df, dailystar_df, filtered_new_data
@@ -52,8 +50,8 @@ class ScrapingApi:
             )
 
             duplicate_check = DuplicateCheck()
-            final_dataframe_after_removing_duplicate = (
-                duplicate_check.duplicate_data_check(final_dataframe, db_data)
+            final_dataframe_after_removing_duplicate = duplicate_check.duplicate_data_check(
+                final_dataframe, db_data
             )
 
             save_to_database = self.save_data_to_database.save_to_database(
@@ -89,16 +87,18 @@ class ScrapingApi:
 
                 for article in articles:
                     try:
-                        article_url = article.find("h3").find("a")["href"].strip()
-                        if article_url not in existing_urls:
-                            existing_urls.append(article_url)
-                            text, date, title = self.common.extract_article_from_url(
-                                article_url
-                            )
-                            if text and date:
-                                newage_upperframe.append(
-                                    (date, article_url, text, title)
-                                )
+                        article_heading = article.find("h3")
+                        if article_heading:
+                            article_link = article_heading.find("a")
+                            if article_link and "href" in article_link.attrs:
+                                article_url = article_link["href"].strip()
+                                if article_url not in existing_urls:
+                                    existing_urls.append(article_url)
+                                    text, date, title = self.common.extract_article_from_url(
+                                        article_url
+                                    )
+                                    if text and date:
+                                        newage_upperframe.append((date, article_url, text, title))
                     except Exception as e:
                         print(e)
             except Exception as e:
@@ -119,9 +119,7 @@ class ScrapingApi:
         newage_df["accident_datetime_from_url"] = pd.to_datetime(
             newage_df["accident_datetime_from_url"], errors="coerce"
         )
-        newage_df.sort_values(
-            by="accident_datetime_from_url", na_position="last", inplace=True
-        )
+        newage_df.sort_values(by="accident_datetime_from_url", na_position="last", inplace=True)
 
         return newage_df
 
@@ -130,11 +128,11 @@ class ScrapingApi:
         # Scrape the website
         for page in range(0, 1):  # Example for 2 pages
             if page == 0:
-                page_url = (
-                    "https://www.thedailystar.net/news/bangladesh/accidents-fires"
-                )
+                page_url = "https://www.thedailystar.net/news/bangladesh/accidents-fires"
             else:
-                page_url = f"https://www.thedailystar.net/news/bangladesh/accidents-fires?page={page}"
+                page_url = (
+                    f"https://www.thedailystar.net/news/bangladesh/accidents-fires?page={page}"
+                )
 
             print(f"Processing {page_url}")
 
@@ -173,11 +171,14 @@ class ScrapingApi:
         )
         dailystar_df["source"] = "dailystar"
         dailystar_df["accident_datetime_from_url"] = pd.to_datetime(
-            dailystar_df["accident_datetime_from_url"], errors="coerce"
+            dailystar_df["accident_datetime_from_url"],
+            format="%m/%d/%Y %I:%M:%S %p",
+            errors="coerce",
         )
-        dailystar_df.sort_values(
-            by="accident_datetime_from_url", na_position="last", inplace=True
-        )
+        dailystar_df.sort_values(by="accident_datetime_from_url", na_position="last", inplace=True)
+        # Status after converting dates to datetime
+        invalid_dates = dailystar_df[pd.isnull(dailystar_df["accident_datetime_from_url"])]
+        print("Invalid or unparseable dates found:", invalid_dates)
 
         return dailystar_df
 
@@ -192,8 +193,7 @@ class ScrapingApi:
         for article in articles:
             try:
                 article_url = (
-                    "https://www.thedailystar.net"
-                    + article.find("a", href=True)["href"].strip()
+                    "https://www.thedailystar.net" + article.find("a", href=True)["href"].strip()
                 )
                 if article_url not in existing_urls:
                     existing_urls.append(article_url)
@@ -283,9 +283,7 @@ class ScrapingApi:
             ~new_filtered_data["URL"].isin(google_alerts_urls_to_exclude)
         ]
 
-        filtered_new_data["accident_datetime_from_url"] = filtered_new_data[
-            "Date & Time"
-        ]
+        filtered_new_data["accident_datetime_from_url"] = filtered_new_data["Date & Time"]
 
         return filtered_new_data
 
@@ -329,16 +327,12 @@ class ScrapingApi:
         )
 
         # Merge DataFrames
-        combined_df = pd.concat([newage_df, dailystar_df, new_articles_df]).reset_index(
-            drop=True
-        )
+        combined_df = pd.concat([newage_df, dailystar_df, new_articles_df]).reset_index(drop=True)
         combined_df["accident_datetime_from_url"] = pd.to_datetime(
             combined_df["accident_datetime_from_url"], errors="coerce"
         )
 
-        combined_df.sort_values(
-            by="accident_datetime_from_url", na_position="last", inplace=True
-        )
+        combined_df.sort_values(by="accident_datetime_from_url", na_position="last", inplace=True)
         combined_df = combined_df.drop_duplicates(subset="url")
 
         df = []
@@ -396,9 +390,7 @@ class ScrapingApi:
             relevant_df["Duplicate"] = False
 
             # Process for each unique date for duplicate detection
-            relevant_df["Date"] = pd.to_datetime(
-                relevant_df["accident_datetime_from_url"]
-            ).dt.date
+            relevant_df["Date"] = pd.to_datetime(relevant_df["accident_datetime_from_url"]).dt.date
             unique_dates = relevant_df["Date"].unique()
 
             for date in unique_dates:
@@ -410,12 +402,8 @@ class ScrapingApi:
                     # Mark duplicates
                     for i in range(len(similarity_matrix)):
                         for j in range(i + 1, len(similarity_matrix)):
-                            if (
-                                similarity_matrix[i][j] > 0.9
-                            ):  # Adjust threshold as needed
-                                relevant_df.at[
-                                    daily_articles.index[j], "Duplicate"
-                                ] = True
+                            if similarity_matrix[i][j] > 0.9:  # Adjust threshold as needed
+                                relevant_df.at[daily_articles.index[j], "Duplicate"] = True
 
             # Filter out duplicates
             ultimate_final_df = relevant_df[~relevant_df["Duplicate"]]

@@ -71,7 +71,7 @@ const MapLogicComponent = ({ geojsonData, onAreaClick, leadingParties }) => {
         return {
           fillColor: leadingParty,
           fillOpacity: "0.55",
-          color: "#202940",
+          color: "#061434",
           weight: 1,
         };
       }}

@@ -1,20 +1,16 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import HelpCenterIcon from "@mui/icons-material/HelpCenter";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import { styled } from "@mui/material/styles";
-import { Link } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-// const FeedbackForm = React.lazy(() => import("./FeedbackForm"));
 
 const Navbar = () => {
   const theme = useTheme();
@@ -22,28 +18,6 @@ const Navbar = () => {
   const isSmallOrMediumScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  // const [anchorEl, setAnchorEl] = useState(null);
-
-  // const open = Boolean(anchorEl);
-  // const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
-
-  // const handleFeedbackOpen = () => {
-  //   setFeedbackDialogOpen(true);
-  //   handleClose(); // This will close the dropdown menu
-  // };
-
-  // const handleFeedbackClose = () => {
-  //   setFeedbackDialogOpen(false);
-  // };
-
-  // const handleHelpMenu = (event) => {
-  //   setAnchorEl(event.currentTarget);
-  // };
-
-  // const handleClose = () => {
-  //   setAnchorEl(null);
-  // };
-
   const toggleDrawer = (open) => (event) => {
     if (
       event.type === "keydown" &&
@@ -55,7 +29,7 @@ const Navbar = () => {
   };
 
   const darkThemeStyle = {
-    background: "linear-gradient(to right, #1E293B, #182034,  #1E293B)",
+    backgroundColor: "#061434",
     mx: "auto",
     mt: 2,
     maxWidth: isSmallScreen ? "92%" : "85%",
@@ -64,29 +38,38 @@ const Navbar = () => {
 
   const drawerStyle = {
     ".MuiDrawer-paper": {
-      backgroundColor: "#123456",
-      color: "white",
+      backgroundColor: "#060522",
+      color: "#CBD5E1",
       paddingTop: "20px",
     },
   };
 
-  const StyledLink = styled(Link)({
-    marginRight: "20px",
+  // eslint-disable-next-line no-unused-vars
+  const StyledLink = styled(RouterLink)(({ theme }) => ({
     textDecoration: "none",
-    color: "white",
+    color: "#CBD5E1",
     "&:hover": {
       color: "#c77676",
     },
-  });
+  }));
 
   const titleStyle = {
     position: "absolute",
-    left: "50%",
-    transform: "translateX(-50%)",
-    color: "white",
+    left: "0",
+    // transform: "translateX(-50%)",
+    color: "#CBD5E1",
     textDecoration: "none",
     py: 1.5,
+    "&:hover": {
+      color: "#c77676",
+    },
   };
+
+  const menuItems = [
+    { text: "Road Accident Dashboard", path: "/road-accident-dashboard" },
+    { text: "Election Survey", path: "/election-survey" },
+    // { text: "Commodities", path: "/commodities" },
+  ];
 
   const list = () => (
     <div
@@ -95,18 +78,10 @@ const Navbar = () => {
       onKeyDown={toggleDrawer(false)}
     >
       <List>
-        {["Road Accident Dashboard", "Election Survey"].map((text, index) => (
-          <ListItem button key={text}>
-            <StyledLink
-              to={
-                index === 0
-                  ? "/"
-                  : // : index === 1
-                    // ? "/commodities"
-                    "/election_survey"
-              }
-            >
-              {text}
+        {menuItems.map((item) => (
+          <ListItem button key={item.text}>
+            <StyledLink to={item.path}>
+              <Typography variant="body1">{item.text}</Typography>
             </StyledLink>
           </ListItem>
         ))}
@@ -117,8 +92,14 @@ const Navbar = () => {
   return (
     <div>
       <AppBar position="static" sx={darkThemeStyle}>
-        <Toolbar sx={{ justifyContent: "flex-end", position: "relative" }}>
-          <Typography variant="h6" component="a" href="/" sx={titleStyle}>
+        <Toolbar
+          sx={{
+            justifyContent: "flex-end",
+            position: "relative",
+            marginLeft: "20px",
+          }}
+        >
+          <Typography variant="h5" component="a" href="/" sx={titleStyle}>
             BDTracks
           </Typography>
           {isSmallOrMediumScreen ? (
@@ -131,56 +112,20 @@ const Navbar = () => {
               <MenuIcon />
             </IconButton>
           ) : (
-            <div>
-              <StyledLink to="/">Road Accident Dashboard</StyledLink>
-              {/* <StyledLink to="/commodities">Commodities</StyledLink> */}
-              <StyledLink to="/election_survey">Election Survey</StyledLink>
-              {/* <IconButton
-                color="inherit"
-                aria-label="help menu"
-                onClick={handleHelpMenu}
-                size="large"
-                sx={{
-                  "&:hover": {
-                    color: "#c77676",
-                  },
-                }}
-              >
-                <HelpCenterIcon />
-              </IconButton>
-              <Menu
-                id="help-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={open}
-                onClose={handleClose}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                sx={{
-                  "& .MuiPaper-root": {
-                    textAlign: "center",
-                    backgroundColor: "#202940",
-                    color: "white",
-                    "&:hover": {
-                      color: "#c77676",
-                    },
-                  },
-                }}
-              >
-                <MenuItem
-                  onClick={handleFeedbackOpen}
-                  sx={{ justifyContent: "flex-end" }}
+            menuItems.map((item, index) => (
+              <StyledLink key={item.text} to={item.path}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    display: "inline",
+                    // Right margin except for the last item
+                    marginRight: index !== menuItems.length - 1 ? "20px" : "0",
+                  }}
                 >
-                  Feedback
-                </MenuItem>
-              </Menu> */}
-            </div>
+                  {item.text}
+                </Typography>
+              </StyledLink>
+            ))
           )}
         </Toolbar>
       </AppBar>
@@ -192,10 +137,6 @@ const Navbar = () => {
       >
         {list()}
       </Drawer>
-      {/* <FeedbackForm
-        open={feedbackDialogOpen}
-        handleClose={handleFeedbackClose}
-      /> */}
     </div>
   );
 };
