@@ -3,6 +3,9 @@ import copy
 
 
 class DuplicateCheck:
+    TRUE = 1
+    FALSE = 0
+
     def duplicate_data_check(self, final_dataframe, existing_urls):
         try:
             existing_df = pd.DataFrame(existing_urls)
@@ -10,9 +13,14 @@ class DuplicateCheck:
             main_df = copy.deepcopy(final_dataframe)
 
             # Convert the 'accident_datetime_from_url' to datetime and extract the date
-            main_df["accident_date"] = pd.to_datetime(
-                main_df["accident_datetime_from_url"]
-            ).dt.date
+            try:
+                main_df["accident_date"] = pd.to_datetime(
+                    main_df["accident_datetime_from_url"],
+                    errors="coerce",  # Handle conversion errors by setting unparseable dates to NaT
+                ).dt.date
+            except Exception as e:
+                print(f"Conversion to datetime failed: {e}")
+                raise
 
             replacements = {
                 "Chittagong": "Chattogram",
@@ -62,7 +70,7 @@ class DuplicateCheck:
 
         except Exception as e:
             # This block will execute if any error occurs in the try block
-            print(f"An error occurred: {e}")
+            print(f"An error occurred in duplicate processing: {e}")
             raise
 
         finally:
@@ -79,7 +87,7 @@ class DuplicateCheck:
             or compare_row_day == ""
         ):
             return True
-        # If neither is NaN or None, compare them directly
+        # If neither is NaN nor None, compare them directly
         return row_day == compare_row_day
 
     def is_duplicate(self, row, compare_row):
@@ -120,7 +128,7 @@ class DuplicateCheck:
             ]
             if pd.notnull(row[loc_col]) and pd.notnull(compare_row[loc_col])
         )
-        ##print('location_criteria_satisfied',location_criteria_satisfied)
+        # print('location_criteria_satisfied',location_criteria_satisfied)
         if location_criteria_satisfied > 0:
             location_criteria_satisfied = location_criteria_satisfied + 1
 
@@ -145,7 +153,7 @@ class DuplicateCheck:
         # Convert dates to datetime in new entries for comparison
         new_entries["accident_date"] = pd.to_datetime(new_entries["accident_date"])
         # Prepare a column for marking duplicates
-        new_entries["duplicate_check"] = ""
+        new_entries["duplicate_check"] = DuplicateCheck.FALSE
 
         # Concatenate existing_df and new_entries
         df = pd.concat([existing_df, new_entries], ignore_index=True)
@@ -169,7 +177,7 @@ class DuplicateCheck:
 
                 compare_row = df.loc[jdx]
                 if self.is_duplicate(row, compare_row):
-                    df.at[idx, "duplicate_check"] = "duplicate"
+                    df.at[idx, "duplicate_check"] = DuplicateCheck.TRUE
                     break  # Once a duplicate is found, no need to check further
 
         # Return only the new entries portion with updated duplicate status

@@ -38,6 +38,8 @@ class GPT4Api:
             "tertiary_vehicle_involved",
             "any_more_vehicles_involved",
             "available_ages_of_the_deceased",
+            "headline",
+            "summary",
         ]
 
         expected_columns = [
@@ -62,6 +64,8 @@ class GPT4Api:
             "tertiary_vehicle_involved",
             "any_more_vehicles_involved",
             "available_ages_of_the_deceased",
+            "headline",
+            "summary",
             "accident_datetime_from_url",
             "url",
             "source",
@@ -174,6 +178,10 @@ class GPT4Api:
         
                     - 'available_ages_of_the_deceased': Give all ages in comma separated if available, otherwise null. Include only ages, no names of the deceased.
         
+                    - 'headline': Create a headline for the accident details from the news article
+                    
+                    - 'summary': Create a summary of the accident details from the news article
+                    
                     Use null for any missing information. Be as accurate as possible based on the text provided and use your intelligence.
                     """
 
@@ -370,6 +378,8 @@ class GPT4Api:
             "tertiary_vehicle_involved",
             "any_more_vehicles_involved",
             "available_ages_of_the_deceased",
+            "headline",
+            "summary",
             "accident_datetime_from_url",
             "url",
             "source",

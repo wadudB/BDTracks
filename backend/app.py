@@ -77,7 +77,7 @@ def get_accident_reports():
             FROM `all_accidents_data`
             WHERE `is_country_bangladesh_or_other_country` = "Bangladesh"
             And `is_the_accident_data_yearly_monthly_or_daily` = "daily"
-            AND (`duplicate_check` IS NULL OR `duplicate_check` = '')
+            AND `duplicate_check` = 0
             ORDER BY `accident_datetime_from_url` DESC LIMIT 50;
             """
 
