@@ -75,9 +75,7 @@ class GPT4Api:
             "article_title",
         ]
 
-        standard_headers_snake_case = [
-            self.to_snake_case(header) for header in standard_headers
-        ]
+        standard_headers_snake_case = [self.to_snake_case(header) for header in standard_headers]
         # Define the snake case headers DataFrame
         template_df = pd.DataFrame(columns=expected_columns)
 
@@ -239,9 +237,7 @@ class GPT4Api:
 
                     # Now concatenate the DataFrames
                     # if previous dataframe or csv is available then only concat the new one with the existing
-                    inter_dataframe = pd.concat(
-                        processed_dataframes2, ignore_index=True
-                    )
+                    inter_dataframe = pd.concat(processed_dataframes2, ignore_index=True)
                     # Save to file
                     # inter_dataframe.to_csv(
                     #     '/content/drive/MyDrive/road_accident_tracker/new update data all 2020_23/alldata_vdec30_23_intermediate.csv',
@@ -254,8 +250,7 @@ class GPT4Api:
             # After the loop, save any remaining data
             # processed_dataframes2 = [standardize_headers(df) for df in processed_dataframes]
             processed_dataframes2 = [
-                self.standardize_column_names(df, template_df)
-                for df in processed_dataframes
+                self.standardize_column_names(df, template_df) for df in processed_dataframes
             ]
 
             final_dataframe = pd.concat(processed_dataframes2, ignore_index=True)
@@ -400,9 +395,7 @@ class GPT4Api:
                     json_start_index = block.find("```json\n")
                     if json_start_index != -1:
                         # Extract the JSON string starting from the found index
-                        json_data = block[json_start_index + len("```json\n") :].split(
-                            "\n```"
-                        )[0]
+                        json_data = block[json_start_index + len("```json\n") :].split("\n```")[0]
 
                         # Parse the JSON string
                         accident_data = json.loads(json_data)
@@ -416,14 +409,12 @@ class GPT4Api:
                             for data in accident_data:
                                 if isinstance(data, dict):
                                     full_data = {
-                                        col: data.get(col, np.nan)
-                                        for col in expected_columns
+                                        col: data.get(col, np.nan) for col in expected_columns
                                     }
                                     all_accident_data.append(full_data)
                         elif isinstance(accident_data, dict):
                             full_data = {
-                                col: accident_data.get(col, np.nan)
-                                for col in expected_columns
+                                col: accident_data.get(col, np.nan) for col in expected_columns
                             }
                             all_accident_data.append(full_data)
 

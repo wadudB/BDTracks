@@ -20,9 +20,7 @@ class CalculateSummary:
         monthly_totals = collections.defaultdict(float)
         yearly_totals = collections.defaultdict(float)
         vehicle_accident_count = collections.defaultdict(int)
-        yearly_vehicle_accident_count = collections.defaultdict(
-            lambda: collections.Counter()
-        )
+        yearly_vehicle_accident_count = collections.defaultdict(lambda: collections.Counter())
 
         # Initialize dictionaries to store the totals for injured
         daily_injured_totals_last_30_days = collections.defaultdict(float)
@@ -30,9 +28,7 @@ class CalculateSummary:
         yearly_injured_totals = collections.defaultdict(float)
         yearly_accident_totals = collections.defaultdict(float)
         yearly_location_counts = collections.defaultdict(lambda: collections.Counter())
-        yearly_accidents_by_district = collections.defaultdict(
-            lambda: collections.defaultdict(int)
-        )
+        yearly_accidents_by_district = collections.defaultdict(lambda: collections.defaultdict(int))
 
         # yearly_killed_by_district = collections.defaultdict(
         #     lambda: collections.defaultdict(float)
@@ -262,21 +258,13 @@ class CalculateSummary:
                 )
                 # Prepare the daily injured JSON
                 daily_injured_json = json.dumps(
-                    {
-                        k: v
-                        for k, v in daily_injured_totals.items()
-                        if k.startswith(str(year))
-                    }
+                    {k: v for k, v in daily_injured_totals.items() if k.startswith(str(year))}
                 )
                 vehicles_involved_json = json.dumps(yearly_vehicle_accident_count[year])
                 # Prepare the monthly deaths JSON
                 # Convert the tuple keys to string keys in the format 'YYYY-MM'
                 monthly_deaths_json = json.dumps(
-                    {
-                        f"{k[0]}-{k[1]:02d}": v
-                        for k, v in monthly_totals.items()
-                        if k[0] == year
-                    }
+                    {f"{k[0]}-{k[1]:02d}": v for k, v in monthly_totals.items() if k[0] == year}
                 )
 
                 monthly_injured_json = json.dumps(

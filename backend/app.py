@@ -217,11 +217,7 @@ def submit_vote():
         cursor.close()
         conn.close()
         return (
-            jsonify(
-                {
-                    "message": "Vote already recorded. Only one vote per user is permitted."
-                }
-            ),
+            jsonify({"message": "Vote already recorded. Only one vote per user is permitted."}),
             403,
         )
 

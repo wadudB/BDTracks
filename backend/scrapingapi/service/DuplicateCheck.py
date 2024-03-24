@@ -61,9 +61,7 @@ class DuplicateCheck:
                 main_df[col] = main_df[col].replace(replacements, regex=True)
 
             # Use the function to check the new batch of data
-            final_dataframe_checked = self.check_new_entries_for_duplicates(
-                main_df, existing_df
-            )
+            final_dataframe_checked = self.check_new_entries_for_duplicates(main_df, existing_df)
 
             print("Final save complete for  duplicate")
             return final_dataframe_checked
@@ -96,8 +94,7 @@ class DuplicateCheck:
             row["division_of_accident"] == compare_row["division_of_accident"]
             and row["district_of_accident"] == compare_row["district_of_accident"]
             and row["accident_type"] == compare_row["accident_type"]
-            and row["total_number_of_people_killed"]
-            == compare_row["total_number_of_people_killed"]
+            and row["total_number_of_people_killed"] == compare_row["total_number_of_people_killed"]
         )
         # print('must_match',must_match)
         # Check if day of the week is given and matches
@@ -140,10 +137,7 @@ class DuplicateCheck:
             compare_row["secondary_vehicle_involved"],
         ]:
             additional_criteria_match += 1
-        if (
-            row["total_number_of_people_injured"]
-            == compare_row["total_number_of_people_injured"]
-        ):
+        if row["total_number_of_people_injured"] == compare_row["total_number_of_people_injured"]:
             additional_criteria_match += 1
         # print("additional_criteria_match", additional_criteria_match)
         # At least two matches are needed from location and additional columns
