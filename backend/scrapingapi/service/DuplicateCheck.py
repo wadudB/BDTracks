@@ -12,6 +12,9 @@ class DuplicateCheck:
 
             main_df = copy.deepcopy(final_dataframe)
 
+            if main_df["accident_datetime_from_url"].isna().any():
+                print("There are NaN values in the 'accident_datetime_from_url'.")
+
             # Convert the 'accident_datetime_from_url' to datetime and extract the date
             try:
                 main_df["accident_date"] = pd.to_datetime(
@@ -72,8 +75,10 @@ class DuplicateCheck:
             raise
 
         finally:
-            # This block will always execute, regardless of whether an error occurred or not
-            print("Execution completed, with or without errors.")
+            if "e" in locals() or "e" in globals():
+                print("Execution completed with errors.")
+            else:
+                print("Execution completed successfully.")
 
     @staticmethod
     def is_day_of_week_match(row_day, compare_row_day):
