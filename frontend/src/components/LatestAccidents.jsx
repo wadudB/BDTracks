@@ -231,28 +231,34 @@ const LatestAccidents = ({ latestAccidentData }) => {
                   variant="body2"
                   sx={{ mt: 2, color: theme.palette.text.primary }}
                 >
-                  Injured:
+                  Injured:{" "}
                   {convertToIntegerOrDefault(
                     selectedRow.total_number_of_people_injured
                   )}
-                  Killed:
+                </Typography>
+                <Typography
+                  id="modal-modal-description"
+                  variant="body2"
+                  sx={{ mt: 1, color: theme.palette.text.primary }}
+                >
+                  Killed:{" "}
                   {convertToIntegerOrDefault(
                     selectedRow.total_number_of_people_killed
                   )}
                 </Typography>
-
+                <Typography
+                  variant="body2"
+                  sx={{ mt: 1, color: theme.palette.text.primary }}
+                >
+                  Date & Time (BDT): {selectedRow.accident_datetime_from_url}
+                </Typography>
                 <Typography
                   variant="body2"
                   sx={{ mt: 1, color: theme.palette.text.primary }}
                 >
                   Location: {selectedRow.exact_location_of_accident}
                 </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ mt: 1, color: theme.palette.text.primary }}
-                >
-                  Date Time (BDT): {selectedRow.accident_datetime_from_url}
-                </Typography>
+
                 <Typography
                   variant="h6"
                   sx={{ mt: 3, color: theme.palette.text.primary }}

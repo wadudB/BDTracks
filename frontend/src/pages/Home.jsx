@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { Typography, Box, Unstable_Grid2 as Grid2 } from "@mui/material";
-import AboutUs from "../components/AboutUS";
+import AboutUs from "../components/AboutUs";
 import FeatureCard from "../components/FeatureCard";
 import ContactForm from "../components/ContactForm ";
 const Home = () => {
