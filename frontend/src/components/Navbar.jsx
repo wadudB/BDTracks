@@ -39,7 +39,7 @@ const Navbar = () => {
   const drawerStyle = {
     ".MuiDrawer-paper": {
       backgroundColor: "#060522",
-      color: "#CBD5E1",
+      color: theme.palette.text.primary,
       paddingTop: "20px",
     },
   };
@@ -47,9 +47,9 @@ const Navbar = () => {
   // eslint-disable-next-line no-unused-vars
   const StyledLink = styled(RouterLink)(({ theme }) => ({
     textDecoration: "none",
-    color: "#CBD5E1",
+    color: theme.palette.text.primary,
     "&:hover": {
-      color: "#c77676",
+      color: theme.palette.text.highlight,
     },
   }));
 
@@ -57,11 +57,11 @@ const Navbar = () => {
     position: "absolute",
     left: "0",
     // transform: "translateX(-50%)",
-    color: "#CBD5E1",
+    color: theme.palette.text.primary,
     textDecoration: "none",
     py: 1.5,
     "&:hover": {
-      color: "#c77676",
+      color: theme.palette.text.highlight,
     },
   };
 

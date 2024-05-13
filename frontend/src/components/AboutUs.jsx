@@ -1,5 +1,6 @@
 import { Box, Grid, Typography, useTheme } from "@mui/material";
 import PropTypes from "prop-types";
+
 const AboutUs = ({ imageSrc, description }) => {
   const theme = useTheme();
 
@@ -25,7 +26,7 @@ const AboutUs = ({ imageSrc, description }) => {
         <Grid item xs={12} md={6}>
           <Typography
             variant="body1"
-            sx={{ color: "#CBD5E1" }}
+            sx={{ color: theme.palette.text.primary }}
             textAlign="justify"
           >
             {description}
@@ -35,6 +36,8 @@ const AboutUs = ({ imageSrc, description }) => {
     </Box>
   );
 };
+
+// PropTypes
 AboutUs.propTypes = {
   imageSrc: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,

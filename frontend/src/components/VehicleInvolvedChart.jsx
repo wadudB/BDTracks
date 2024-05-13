@@ -4,8 +4,9 @@ import PropTypes from "prop-types";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { useTheme } from "@mui/material/styles";
 
-// Custom hook to listen to window resize events
+// Window resize
 const useWindowSize = () => {
   const [size, setSize] = useState([window.innerWidth, window.innerHeight]);
   useEffect(() => {
@@ -24,6 +25,7 @@ const VehicleInvolvedChart = ({ vehiclesInvolved, slideIndex, maxValue }) => {
   const rowsPerSlide = 18;
   const startRow = slideIndex * rowsPerSlide;
   const endRow = startRow + rowsPerSlide;
+  const theme = useTheme();
 
   const vehicleData = useMemo(() => {
     const vehicleEntries = Object.entries(vehiclesInvolved);
@@ -106,14 +108,14 @@ const VehicleInvolvedChart = ({ vehiclesInvolved, slideIndex, maxValue }) => {
           display: true,
           text: "Vehicle Involvement in Accidents",
           position: "bottom",
-          color: "#CBD5E1",
+          color: theme.palette.text.primary,
         },
       },
     }),
     [maxValue]
   );
 
-  // Adjust the style based on the window size
+  // Window size
   const chartStyle = {
     height: width < 600 ? "600px" : "600px",
     width: "100%",
@@ -138,8 +140,8 @@ const ChartCarousel = ({ vehiclesInvolved }) => {
   const maxValue = Math.max(...Object.values(vehiclesInvolved));
 
   const sliderSettings = {
-    dots: true, // Enable bottom dots
-    arrows: false, // Disable left and right arrows
+    dots: true,
+    arrows: false,
     infinite: false,
     speed: 500,
     slidesToShow: 1,
@@ -164,6 +166,7 @@ const ChartCarousel = ({ vehiclesInvolved }) => {
   );
 };
 
+// PropTypes
 ChartCarousel.propTypes = {
   vehiclesInvolved: PropTypes.objectOf(PropTypes.number),
 };

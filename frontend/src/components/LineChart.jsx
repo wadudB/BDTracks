@@ -93,6 +93,7 @@ const LineChart = ({ dailyDeathsData, dailyInjuredData }) => {
   );
 };
 
+// PropTypes
 LineChart.propTypes = {
   dailyDeathsData: PropTypes.any,
   dailyInjuredData: PropTypes.any,

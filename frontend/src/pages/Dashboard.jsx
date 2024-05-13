@@ -27,7 +27,7 @@ const Dashboard = () => {
   const [geojsonData, setGeojsonData] = useState(null);
   const [accidentData, setAccidentdata] = useState([]);
   const [latestAccidentData, setLatestAccidentData] = useState([]);
-  const [viewMode, setViewMode] = useState("monthly"); // 'monthly' or 'yearly'
+  const [viewMode, setViewMode] = useState("monthly");
   const [totalAccidents, setTotalAccidents] = useState(0);
   const [totalDeaths, setTotalDeaths] = useState(0);
   const [totalInjured, setTotalInjured] = useState(0);
@@ -41,10 +41,10 @@ const Dashboard = () => {
   const [accidentsByDistrict, setAccidentsByDistrict] = useState({});
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  const [isLoading, setIsLoading] = useState(false); // Added loading state
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Function to fetch data from Flask API
+  // Fetch all accident summary data
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -62,7 +62,7 @@ const Dashboard = () => {
     }
   };
 
-  // Function to fetch data from Flask API
+  // Fetch Latest Accident Data
   const fetchLatestAccidentData = async () => {
     try {
       setIsLoading(true);
@@ -130,7 +130,7 @@ const Dashboard = () => {
     return (Math.sqrt(accidentCount) * baseRadius) / 1.8;
   };
 
-  // Function to extract unique years from the response
+  // Extract unique years
   const getUniqueYears = () => {
     const years = new Set();
     accidentData.forEach((item) => {
@@ -196,7 +196,7 @@ const Dashboard = () => {
           variant="h4"
           className="mb-4"
           sx={{
-            color: "#CBD5E1",
+            color: theme.palette.text.primary,
             fontSize: {
               xs: "1.88rem",
               sm: "1.88rem",
@@ -213,41 +213,41 @@ const Dashboard = () => {
             sx={{
               marginLeft: 2,
               width: 100,
-              color: "#CBD5E1",
+              color: theme.palette.text.primary,
               textAlign: "right",
               borderColor: "white",
               borderWidth: 0.1,
               fontSize: {
-                xs: "0.875rem", // smaller font size on extra-small screens
-                sm: "1rem", // default font size on small screens and up
+                xs: "0.875rem",
+                sm: "1rem",
               },
               backgroundColor: "#061434",
               borderStyle: "solid",
               "& .MuiSelect-select": {
-                // Style for the select input
+                // Select input
                 padding: "6px",
               },
               "& .MuiSvgIcon-root": {
-                // Style for the dropdown icon
-                color: "#CBD5E1",
+                // Dopdown icon
+                color: theme.palette.text.primary,
                 fontSize: "1.25rem",
               },
               "&:hover": {
-                color: "#c77676",
+                color: theme.palette.text.highlight,
               },
             }}
             MenuProps={{
               PaperProps: {
                 style: {
                   backgroundColor: "#061434",
-                  color: "#CBD5E1",
+                  color: theme.palette.text.primary,
                 },
               },
               sx: {
                 ".MuiMenuItem-root": {
                   justifyContent: "center",
                   "&:hover": {
-                    color: "#c77676",
+                    color: theme.palette.text.highlight,
                   },
                 },
               },
@@ -343,14 +343,14 @@ const Dashboard = () => {
                       onChange={handleViewModeChange}
                       sx={{
                         "& .MuiToggleButtonGroup-grouped": {
-                          color: "#CBD5E1",
+                          color: theme.palette.text.primary,
                           backgroundColor: "rgba(255,255,255,0.2)",
                           "&.Mui-selected, &.Mui-selected:hover": {
-                            color: "#CBD5E1",
+                            color: theme.palette.text.primary,
                             borderColor: "white",
                           },
                           "&:hover": {
-                            color: "#c77676",
+                            color: theme.palette.text.highlight,
                             borderColor: "white",
                           },
                         },

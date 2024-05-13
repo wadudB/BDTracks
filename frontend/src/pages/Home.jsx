@@ -50,7 +50,7 @@ const Home = () => {
               md: "2.5rem",
               lg: "3rem",
             },
-            color: "#CBD5E1",
+            color: theme.palette.text.primary,
             textAlign: "justify",
             width: "100%",
 
@@ -73,7 +73,7 @@ const Home = () => {
               lg: "40%",
               xl: "40%",
             },
-            color: "#CBD5E1",
+            color: theme.palette.text.primary,
             mt: 2,
             textAlign: "justify",
           }}
@@ -214,7 +214,7 @@ const Home = () => {
         <Typography
           variant="h4"
           sx={{
-            color: "#CBD5E1",
+            color: theme.palette.text.primary,
             fontSize: {
               xs: "1.88rem",
               sm: "1.88rem",
@@ -227,7 +227,10 @@ const Home = () => {
         >
           Contact
         </Typography>
-        <Typography variant="body1" sx={{ color: "#CBD5E1", mb: 5 }}>
+        <Typography
+          variant="body1"
+          sx={{ color: theme.palette.text.primary, mb: 5 }}
+        >
           Get In Touch With Us
         </Typography>
         <ContactForm />

@@ -22,7 +22,8 @@ const AdminConstituency = React.lazy(() =>
   import("../components/AdminConstituency ")
 );
 const AdminParty = React.lazy(() => import("../components/AdminParty"));
-const WhiteTextField = styled(TextField)({
+
+const WhiteTextField = styled(TextField)(({ theme }) => ({
   "& label": {
     color: "grey",
   },
@@ -37,10 +38,10 @@ const WhiteTextField = styled(TextField)({
       borderColor: "grey",
     },
     "&.Mui-focused fieldset": {
-      borderColor: "#c77676",
+      borderColor: theme.palette.text.highlight,
     },
   },
-});
+}));
 
 const Admin = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -72,7 +73,7 @@ const Admin = () => {
   });
 
   const handleLoginSuccess = (token) => {
-    localStorage.setItem("authToken", token); // Store the token
+    localStorage.setItem("authToken", token);
     setToken(token);
     setIsLoggedIn(true);
   };
@@ -103,8 +104,6 @@ const Admin = () => {
   };
 
   useEffect(() => {
-    // Asynchronous function to fetch commodity data
-
     if (isLoggedIn) {
       fetchCommodityData();
     }
@@ -127,7 +126,6 @@ const Admin = () => {
   };
 
   useEffect(() => {
-    // Asynchronous function to fetch commodity data
     if (isLoggedIn) {
       fetchParties();
       fetchConstituencies();
@@ -175,7 +173,6 @@ const Admin = () => {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
 
-    // Data to be sent
     const candidateData = {
       name: candidateName,
       party_id: partyId,
@@ -224,7 +221,6 @@ const Admin = () => {
   const handlePartyFormSubmit = async (event) => {
     event.preventDefault();
 
-    // Data to be sent
     const partyData = {
       alliance: alliance,
       party: partyName,
@@ -353,7 +349,7 @@ const Admin = () => {
                       color: "white",
                       borderColor: "white",
                       "&:hover": {
-                        backgroundColor: "#c77676",
+                        backgroundColor: theme.palette.text.highlight,
                         borderColor: "black",
                       },
                     }}
@@ -445,7 +441,7 @@ const Admin = () => {
                 borderColor: "white",
                 mt: 2,
                 "&:hover": {
-                  backgroundColor: "#c77676",
+                  backgroundColor: theme.palette.text.highlight,
                   borderColor: "black",
                 },
               }}
@@ -487,7 +483,7 @@ const Admin = () => {
                       color: "white",
                       borderColor: "white",
                       "&:hover": {
-                        backgroundColor: "#c77676",
+                        backgroundColor: theme.palette.text.highlight,
                         borderColor: "black",
                       },
                     }}
@@ -569,7 +565,7 @@ const Admin = () => {
                 borderColor: "white",
                 mt: 2,
                 "&:hover": {
-                  backgroundColor: "#c77676",
+                  backgroundColor: theme.palette.text.highlight,
                   borderColor: "black",
                 },
               }}

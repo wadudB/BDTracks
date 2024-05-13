@@ -14,16 +14,17 @@ import { Checkbox, Button } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import MuiToolTip from "@mui/material/Tooltip";
+import { useTheme } from "@mui/material/styles";
 
-// Table component for displaying candidate details
 const CandidateDetailsTable = ({
   data,
   selectedCandidates,
   setSelectedCandidates,
   onVoteSuccess,
 }) => {
+  const theme = useTheme();
   const CustomButton = styled(Button)(() => ({
-    // Apply styles when the button is disabled
+    // button disabled
     "&.Mui-disabled": {
       color: "rgb(255 255 255 / 26%)",
       boxShadow: "none",
@@ -82,7 +83,6 @@ const CandidateDetailsTable = ({
         message: "Vote added, Thank you for your participation!",
         severity: "success",
       });
-      // Call the passed fetchElectionData function to refresh data
       onVoteSuccess();
     } catch (error) {
       setSnackbarInfo({
@@ -98,7 +98,7 @@ const CandidateDetailsTable = ({
       component={Paper}
       sx={{
         mt: 2,
-        maxHeight: "440px", // Set a fixed height
+        maxHeight: "440px",
         overflow: "auto",
       }}
     >
@@ -123,14 +123,25 @@ const CandidateDetailsTable = ({
       >
         <TableHead style={{ backgroundColor: "#060522" }}>
           <TableRow>
-            <TableCell style={{ color: "#CBD5E1" }}>Candidate</TableCell>
-            <TableCell style={{ color: "#CBD5E1" }} align="right">
+            <TableCell style={{ color: theme.palette.text.primary }}>
+              Candidate
+            </TableCell>
+            <TableCell
+              style={{ color: theme.palette.text.primary }}
+              align="right"
+            >
               Party
             </TableCell>
-            <TableCell style={{ color: "#CBD5E1" }} align="right">
+            <TableCell
+              style={{ color: theme.palette.text.primary }}
+              align="right"
+            >
               Select
             </TableCell>
-            <TableCell style={{ color: "#CBD5E1" }} align="right">
+            <TableCell
+              style={{ color: theme.palette.text.primary }}
+              align="right"
+            >
               Vote
             </TableCell>
           </TableRow>
@@ -141,11 +152,14 @@ const CandidateDetailsTable = ({
               <TableCell
                 component="th"
                 scope="row"
-                style={{ color: "#CBD5E1" }}
+                style={{ color: theme.palette.text.primary }}
               >
                 {row.CandidateName}
               </TableCell>
-              <TableCell style={{ color: "#CBD5E1" }} align="right">
+              <TableCell
+                style={{ color: theme.palette.text.primary }}
+                align="right"
+              >
                 <MuiToolTip
                   title={row.PartyName}
                   enterTouchDelay={0}
@@ -158,16 +172,22 @@ const CandidateDetailsTable = ({
                   </span>
                 </MuiToolTip>
               </TableCell>
-              <TableCell style={{ color: "#CBD5E1" }} align="right">
+              <TableCell
+                style={{ color: theme.palette.text.primary }}
+                align="right"
+              >
                 <Checkbox
-                  sx={{ color: "#CBD5E1" }}
+                  sx={{ color: theme.palette.text.primary }}
                   checked={selectedCandidates[row.CandidateName] || false}
                   onChange={() => handleCheck(row.CandidateName)}
                   // disabled={row.CandidateName === "Nomination Withdrawn"}
                   disabled={true}
                 />
               </TableCell>
-              <TableCell style={{ color: "#CBD5E1" }} align="right">
+              <TableCell
+                style={{ color: theme.palette.text.primary }}
+                align="right"
+              >
                 <CustomButton
                   variant="contained"
                   color="primary"
@@ -188,13 +208,14 @@ const CandidateDetailsTable = ({
     </TableContainer>
   );
 };
+
+// PropTypes
 CandidateDetailsTable.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
       CandidateName: PropTypes.string.isRequired,
       Party: PropTypes.string.isRequired,
       Votes: PropTypes.number,
-      // Add other properties as necessary
     })
   ).isRequired,
   selectedCandidates: PropTypes.object.isRequired,

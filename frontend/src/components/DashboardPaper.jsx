@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { Paper, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 const DashboardPaper = ({
   children,
@@ -8,13 +9,14 @@ const DashboardPaper = ({
   statisticNote,
   ...props
 }) => {
+  const theme = useTheme();
   return (
     <Paper
       className="p-4 flex flex-col justify-between h-full dashboard-paper"
       style={{
         backgroundColor: "#061434",
         borderRadius: "8px",
-        color: "#CBD5E1",
+        color: theme.palette.text.primary,
         justifyContent: "center",
       }}
       {...props}
@@ -35,7 +37,7 @@ const DashboardPaper = ({
   );
 };
 
-// PropTypes for the component
+// PropTypes
 DashboardPaper.propTypes = {
   children: PropTypes.node,
   title: PropTypes.string,

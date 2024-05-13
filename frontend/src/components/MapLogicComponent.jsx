@@ -6,7 +6,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 
 const MapLogicComponent = ({ geojsonData, onAreaClick, leadingParties }) => {
   const map = useMap();
-  const isSmallScreen = useMediaQuery("(max-width: 600px)"); // Define your screen size threshold
+  const isSmallScreen = useMediaQuery("(max-width: 600px)");
 
   useEffect(() => {
     if (!geojsonData) {
@@ -18,7 +18,7 @@ const MapLogicComponent = ({ geojsonData, onAreaClick, leadingParties }) => {
     if (!map._container_id) {
       map._container_id = true;
 
-      // Logic for setting up the tile layer
+      // Tile layer
       const osm = L.TileLayer.boundaryCanvas(
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         {
@@ -32,7 +32,7 @@ const MapLogicComponent = ({ geojsonData, onAreaClick, leadingParties }) => {
     if (isSmallScreen) {
       return;
     }
-    // Logic for creating constituency labels
+    // Constituency labels
     const markers = geojsonData.features.map((feature) => {
       const centroid = L.geoJSON(feature.geometry).getBounds().getCenter();
       const marker = L.marker(centroid, {
@@ -50,11 +50,12 @@ const MapLogicComponent = ({ geojsonData, onAreaClick, leadingParties }) => {
     // Cleanup function
     return () => {
       if (map && map.remove) {
-        markersGroup.clearLayers(); // Clear the markers
+        markersGroup.clearLayers();
+        // Remove the boundaryCanvas layer
         if (osm) {
-          map.removeLayer(osm); // Remove the boundaryCanvas layer if it's defined
+          map.removeLayer(osm);
         }
-        // Remove ukLayer if added to the map and it's defined
+        // Remove Layer
         if (ukLayer && map.hasLayer(ukLayer)) {
           map.removeLayer(ukLayer);
         }
@@ -86,6 +87,7 @@ const MapLogicComponent = ({ geojsonData, onAreaClick, leadingParties }) => {
   );
 };
 
+// PropTypes
 MapLogicComponent.propTypes = {
   geojsonData: PropTypes.object,
   onAreaClick: PropTypes.func.isRequired,

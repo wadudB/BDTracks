@@ -173,23 +173,23 @@ const LatestAccidents = ({ latestAccidentData }) => {
         onRowsPerPageChange={handleChangeRowsPerPage}
         sx={{
           ".MuiTablePagination-toolbar": {
-            color: "#CBD5E1",
+            color: theme.palette.text.primary,
           },
           ".MuiTablePagination-selectLabel, .MuiTablePagination-select, .MuiTablePagination-selectIcon":
             {
-              color: "#CBD5E1",
+              color: theme.palette.text.primary,
             },
           ".MuiTablePagination-displayedRows": {
-            color: "#CBD5E1",
+            color: theme.palette.text.primary,
           },
           ".MuiTablePagination-actions": {
-            color: "#CBD5E1",
+            color: theme.palette.text.primary,
           },
           ".MuiTablePagination-actions button.Mui-disabled": {
             color: "#666666 !important",
           },
           ".MuiTablePagination-actions button:hover": {
-            color: "#c77676",
+            color: theme.palette.text.highlight,
           },
         }}
         slotProps={{
@@ -201,7 +201,7 @@ const LatestAccidents = ({ latestAccidentData }) => {
                 },
                 ".MuiMenuItem-root": {
                   "&:hover": {
-                    color: "#c77676",
+                    color: theme.palette.text.highlight,
                   },
                 },
               },
@@ -280,7 +280,7 @@ const LatestAccidents = ({ latestAccidentData }) => {
                       color: theme.palette.text.primary,
 
                       "&:hover": {
-                        color: "#c77676",
+                        color: theme.palette.text.highlight,
                       },
                     }}
                     onClick={handleCloseModal}
@@ -297,6 +297,7 @@ const LatestAccidents = ({ latestAccidentData }) => {
   );
 };
 
+// PropTypes
 LatestAccidents.propTypes = {
   latestAccidentData: PropTypes.arrayOf(
     PropTypes.shape({
