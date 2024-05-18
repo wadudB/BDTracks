@@ -194,7 +194,7 @@ class GPT4Api:
                 try:
                     # Call to GPT-4 model
                     response = openai.chat.completions.create(
-                        model="gpt-4-1106-preview",
+                        model="gpt-4o",
                         messages=[
                             {"role": "system", "content": prompt_system},
                             {"role": "user", "content": prompt_user_confirm},
