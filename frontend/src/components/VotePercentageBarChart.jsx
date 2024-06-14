@@ -50,7 +50,7 @@ const VotePercentageBarChart = React.memo(
           },
         },
         tooltip: {
-          // Customizing tooltip
+          // Tooltip
           callbacks: {
             label: function (context) {
               let label = context.dataset.label || "";
@@ -89,20 +89,19 @@ const VotePercentageBarChart = React.memo(
         chart.data.datasets.forEach((dataset, i) => {
           const meta = chart.getDatasetMeta(i);
           meta.data.forEach((bar) => {
-            // Set the text styling
+            // Text styling
             ctx.fillStyle = "black";
             const fontSize = 14;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.font = `${fontSize}px Arial`;
 
-            // Retrieve the party name from the dataset
             const partyName = dataset.label;
 
-            // For horizontal centering, use the center of the bar's width
+            // Horizontal centering(bar's width)
             const xPos = bar.getCenterPoint().x;
 
-            // For vertical centering, use the center of the bar's height
+            // For vertical centering(bar's height)
             const yPos = bar.getCenterPoint().y;
 
             // Draw the text if there's enough room within the bar
@@ -139,7 +138,7 @@ const VotePercentageBarChart = React.memo(
 
 VotePercentageBarChart.displayName = "VotePercentageBarChart";
 
-// prop types validation for votePercentages
+// PropTypes
 VotePercentageBarChart.propTypes = {
   votePercentages: PropTypes.arrayOf(
     PropTypes.shape({

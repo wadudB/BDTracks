@@ -17,6 +17,7 @@ const theme = createTheme({
   palette: {
     text: {
       primary: "#CBD5E1",
+      highlight: "#c77676",
     },
   },
 });

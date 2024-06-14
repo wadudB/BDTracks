@@ -98,16 +98,15 @@ const PartyGrid = React.memo(({ leadingParties, isSmallScreen }) => {
           ctx.textBaseline = "middle";
           ctx.font = `${fontSize}px Arial`;
 
-          // Retrieve the party name from the dataset
           const partyName = dataset.party;
 
-          // For horizontal centering, use the center of the bar's width
+          // Horizontal centering (bar's width)
           const xPos = bar.getCenterPoint().x;
 
-          // For vertical centering, use the center of the bar's height
+          // Vertical centering (bar's height)
           const yPos = bar.getCenterPoint().y;
 
-          // Draw the text if there's enough room within the bar
+          // Draw text if there's enough room within the bar
           if (bar.width > ctx.measureText(partyName).width) {
             ctx.fillText(partyName, xPos, yPos);
           }
@@ -136,8 +135,9 @@ const PartyGrid = React.memo(({ leadingParties, isSmallScreen }) => {
     />
   );
 });
-PartyGrid.displayName = "PartyGrid";
 
+// PropTypes
+PartyGrid.displayName = "PartyGrid";
 PartyGrid.propTypes = {
   leadingParties: PropTypes.object.isRequired,
   isSmallScreen: PropTypes.bool.isRequired,

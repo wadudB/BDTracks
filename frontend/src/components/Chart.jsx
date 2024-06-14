@@ -39,10 +39,10 @@ const Chart = ({ monthlyInjured, monthlyDeaths, accidentData, viewMode }) => {
       deathData = yearlyData.map((data) => data.totalKilled);
       injuredData = yearlyData.map((data) => data.totalInjured);
     } else {
-      // Monthly data logic
+      // Sort based on month
       const sortedMonths = Object.keys(monthlyDeaths).sort(
         (a, b) => new Date(a) - new Date(b)
-      ); // Sort based on month
+      );
       labels = sortedMonths.map((month) => {
         const date = new Date(month);
         return date.toLocaleString("default", {
@@ -53,7 +53,7 @@ const Chart = ({ monthlyInjured, monthlyDeaths, accidentData, viewMode }) => {
       injuredData = sortedMonths.map((month) => monthlyInjured[month]);
     }
 
-    // Common dataset configuration
+    // Common dataset
     return {
       labels,
       datasets: [
@@ -92,6 +92,7 @@ const Chart = ({ monthlyInjured, monthlyDeaths, accidentData, viewMode }) => {
   );
 };
 
+// PropTypes
 Chart.propTypes = {
   monthlyInjured: PropTypes.object.isRequired,
   monthlyDeaths: PropTypes.object.isRequired,

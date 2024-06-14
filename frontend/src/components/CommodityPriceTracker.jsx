@@ -9,41 +9,43 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import PropTypes from "prop-types";
-
-const StyledTableCell = styled(TableCell)(() => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#060522",
-    color: "#CBD5E1",
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-    color: "#CBD5E1",
-    backgroundColor: "#061434",
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(() => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: "#061434",
-  },
-  "&:nth-of-type(even)": {
-    backgroundColor: "#1b263b",
-  },
-  "&:hover": {
-    backgroundColor: "#060522",
-    "& > .MuiTableCell-root": {
-      backgroundColor: "#060522",
-    },
-  },
-  // hide last border
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
-}));
+import { useTheme } from "@mui/material/styles";
 
 function CommodityPriceTracker({ commodityData }) {
+  const theme = useTheme();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+  const StyledTableCell = styled(TableCell)(() => ({
+    [`&.${tableCellClasses.head}`]: {
+      backgroundColor: "#060522",
+      color: theme.palette.text.primary,
+    },
+    [`&.${tableCellClasses.body}`]: {
+      fontSize: 14,
+      color: theme.palette.text.primary,
+      backgroundColor: "#061434",
+    },
+  }));
+
+  const StyledTableRow = styled(TableRow)(() => ({
+    "&:nth-of-type(odd)": {
+      backgroundColor: "#061434",
+    },
+    "&:nth-of-type(even)": {
+      backgroundColor: "#1b263b",
+    },
+    "&:hover": {
+      backgroundColor: "#060522",
+      "& > .MuiTableCell-root": {
+        backgroundColor: "#060522",
+      },
+    },
+    // hide last border
+    "&:last-child td, &:last-child th": {
+      border: 0,
+    },
+  }));
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -87,17 +89,17 @@ function CommodityPriceTracker({ commodityData }) {
         onRowsPerPageChange={handleChangeRowsPerPage}
         sx={{
           ".MuiTablePagination-toolbar": {
-            color: "#CBD5E1",
+            color: theme.palette.text.primary,
           },
           ".MuiTablePagination-selectLabel, .MuiTablePagination-select, .MuiTablePagination-selectIcon":
             {
-              color: "#CBD5E1",
+              color: theme.palette.text.primary,
             },
           ".MuiTablePagination-displayedRows": {
-            color: "#CBD5E1",
+            color: theme.palette.text.primary,
           },
           ".MuiTablePagination-actions": {
-            color: "#CBD5E1",
+            color: theme.palette.text.primary,
           },
         }}
       />
@@ -105,6 +107,7 @@ function CommodityPriceTracker({ commodityData }) {
   );
 }
 
+// PropTypes
 CommodityPriceTracker.propTypes = {
   commodityData: PropTypes.arrayOf(
     PropTypes.shape({

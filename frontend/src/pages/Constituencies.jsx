@@ -102,8 +102,7 @@ const Constituencies = () => {
     return constituencyCandidates;
   };
 
-  // useEffect Hooks
-  // Fetching election data from the API
+  // Fetching election data
   useEffect(() => {
     fetchElectionData();
   }, []);
@@ -124,7 +123,6 @@ const Constituencies = () => {
       .then((data) => setGeojsonData(data));
   }, []);
 
-  // Event Handlers
   const handleAreaClick = (feature) => {
     setCurrentFeature(feature);
     setModalOpen(true);
@@ -146,14 +144,14 @@ const Constituencies = () => {
     }
   };
 
-  // Define votePercentages with useMemo
+  // VotePercentages
   const votePercentages = useMemo(() => {
     return currentFeature
       ? getElectionDataForFeature(currentFeature.properties.cst)
       : [];
   }, [currentFeature, electionData]);
 
-  // Conditional Rendering
+  // Error Handler
   if (error)
     return (
       <Box
@@ -189,7 +187,7 @@ const Constituencies = () => {
         <Typography
           variant="h4"
           sx={{
-            color: "#CBD5E1",
+            color: theme.palette.text.primary,
             fontSize: {
               xs: "1.88rem",
               sm: "1.88rem",
@@ -210,10 +208,10 @@ const Constituencies = () => {
           variant="subtitle1"
           sx={{
             // textAlign: {
-            //   xs: "right", // Center-aligned text for xs
-            //   md: "right", // Right-aligned text for md and upwards
+            //   xs: "right",
+            //   md: "right",
             // },
-            color: "#CBD5E1",
+            color: theme.palette.text.primary,
             width: {
               xs: "100%",
               md: "auto",

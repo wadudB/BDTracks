@@ -22,7 +22,7 @@ const CommodityPriceTracker = React.lazy(() =>
   import("../components/CommodityPriceTracker")
 );
 
-const WhiteTextField = styled(TextField)({
+const WhiteTextField = styled(TextField)(({ theme }) => ({
   "& label": {
     color: "grey",
   },
@@ -37,10 +37,10 @@ const WhiteTextField = styled(TextField)({
       borderColor: "grey",
     },
     "&.Mui-focused fieldset": {
-      borderColor: "#c77676",
+      borderColor: theme.palette.text.highlight,
     },
   },
-});
+}));
 
 const Commodities = () => {
   const theme = useTheme();
@@ -108,7 +108,7 @@ const Commodities = () => {
   };
 
   useEffect(() => {
-    // Asynchronous function to fetch commodity data
+    // Fetch commodity data
     const fetchCommodityData = async () => {
       try {
         const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
@@ -188,7 +188,7 @@ const Commodities = () => {
           variant="h4"
           className="mb-4"
           sx={{
-            color: "#CBD5E1",
+            color: theme.palette.text.primary,
             fontSize: {
               xs: "1.88rem",
               sm: "1.88rem",
@@ -202,10 +202,10 @@ const Commodities = () => {
           <Button
             variant="outlined"
             sx={{
-              color: "#CBD5E1",
+              color: theme.palette.text.primary,
               borderColor: "white",
               "&:hover": {
-                backgroundColor: "#c77676",
+                backgroundColor: theme.palette.text.highlight,
                 borderColor: "black",
               },
             }}
@@ -272,7 +272,7 @@ const Commodities = () => {
                 borderColor: "white",
                 mt: 2,
                 "&:hover": {
-                  backgroundColor: "#c77676",
+                  backgroundColor: theme.palette.text.highlight,
                   borderColor: "black",
                 },
               }}

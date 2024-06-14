@@ -2,19 +2,14 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { styled } from "@mui/material/styles";
 
-const WhiteTextField = styled(TextField)({
+const WhiteTextField = styled(TextField)(({ theme }) => ({
   "& label": {
     color: "grey",
   },
@@ -29,10 +24,11 @@ const WhiteTextField = styled(TextField)({
       borderColor: "grey",
     },
     "&.Mui-focused fieldset": {
-      borderColor: "#c77676",
+      borderColor: theme.palette.text.highlight,
     },
   },
-});
+}));
+
 const LoginPanel = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -40,7 +36,7 @@ const LoginPanel = ({ onLoginSuccess }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError(""); // Clear any existing error
+    setError("");
 
     try {
       const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
@@ -56,7 +52,8 @@ const LoginPanel = ({ onLoginSuccess }) => {
       const data = await response.json();
 
       if (response.status === 200) {
-        onLoginSuccess(data.token); // Pass the token to the parent component
+        // Token
+        onLoginSuccess(data.token);
       } else {
         setError(data.error || "Login failed");
       }
@@ -115,6 +112,7 @@ const LoginPanel = ({ onLoginSuccess }) => {
   );
 };
 
+// PropTypes
 LoginPanel.propTypes = {
   onLoginSuccess: PropTypes.func.isRequired,
 };

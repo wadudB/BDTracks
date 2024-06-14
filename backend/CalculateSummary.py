@@ -62,10 +62,19 @@ class CalculateSummary:
 
             # Convert injured count to float
             injured_count = entry["total_number_of_people_injured"]
-            if injured_count and injured_count.lower() != "unknown":
-                injured = float(injured_count)
+            if injured_count:
+                try:
+                    # Convert to float
+                    injured = float(injured_count)
+                except ValueError:
+                    # If conversion fails
+                    if injured_count.lower() == "unknown":
+                        injured = 0.0
+                    else:
+                        print(f"Skipping non-numeric value: {injured_count}")
+                        injured = 0.0
             else:
-                # Handle unknown case
+                # Handle empty or None case
                 injured = 0.0
 
             vehicles = [

@@ -12,6 +12,7 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PropTypes from "prop-types";
+import { useTheme } from "@mui/material/styles";
 
 import {
   Typography,
@@ -22,7 +23,7 @@ import {
   MenuItem,
 } from "@mui/material";
 
-const WhiteTextField = styled(TextField)({
+const WhiteTextField = styled(TextField)(({ theme }) => ({
   "& label": {
     color: "grey",
   },
@@ -37,10 +38,10 @@ const WhiteTextField = styled(TextField)({
       borderColor: "grey",
     },
     "&.Mui-focused fieldset": {
-      borderColor: "#c77676",
+      borderColor: theme.palette.text.highlight,
     },
   },
-});
+}));
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#060522",
@@ -83,6 +84,7 @@ const AdminConstituency = ({
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingCandidate, setEditingCandidate] = useState(null);
+  const theme = useTheme();
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -93,7 +95,7 @@ const AdminConstituency = ({
     setPage(0);
   };
 
-  // Handle edit click for a row
+  // Row edit modal
   const handleEditClick = (candidate) => {
     setEditingCandidate(candidate);
     setEditModalOpen(true);
@@ -126,9 +128,9 @@ const AdminConstituency = ({
         throw new Error("Failed to update candidate");
       }
 
-      // Close the modal
+      // Close modal
       setEditModalOpen(false);
-      // Update local state with the new candidate data
+      // Update candidate data
       fetchCommodityData();
 
       alert("Candidate updated successfully");
@@ -138,7 +140,7 @@ const AdminConstituency = ({
     }
   };
 
-  // Handle delete click for a row
+  // Delete candidate
   const handleDeleteClick = async (row) => {
     const confirmDelete = window.confirm(
       `Are you sure you want to delete ${row.CandidateName}?`
@@ -160,11 +162,10 @@ const AdminConstituency = ({
           throw new Error("Error deleting candidate");
         }
 
-        // Refresh the list or remove the item from the state
+        // Refresh the list
         const updatedData = commodityData.filter(
           (candidate) => candidate.CandidateId !== row.CandidateId
         );
-        // Update the state
         setCommodityData(updatedData);
 
         alert("Candidate deleted successfully");
@@ -240,17 +241,17 @@ const AdminConstituency = ({
         onRowsPerPageChange={handleChangeRowsPerPage}
         sx={{
           ".MuiTablePagination-toolbar": {
-            color: "white", // Change the pagination toolbar text to white
+            color: "white", // Pagination toolbar
           },
           ".MuiTablePagination-selectLabel, .MuiTablePagination-select, .MuiTablePagination-selectIcon":
             {
-              color: "white", // Change the select and icon to white
+              color: "white", // Icon
             },
           ".MuiTablePagination-displayedRows": {
-            color: "white", // Change the displayed rows text to white
+            color: "white", // Rows text
           },
           ".MuiTablePagination-actions": {
-            color: "white", // Change the actions navigation arrows to white
+            color: "white", // Navigation arrows
           },
         }}
       />
@@ -357,7 +358,7 @@ const AdminConstituency = ({
                 borderColor: "white",
                 mt: 2,
                 "&:hover": {
-                  backgroundColor: "#c77676",
+                  backgroundColor: theme.palette.text.highlight,
                   borderColor: "black",
                 },
               }}
@@ -371,6 +372,7 @@ const AdminConstituency = ({
   );
 };
 
+// PropTypes
 AdminConstituency.propTypes = {
   commodityData: PropTypes.arrayOf(
     PropTypes.shape({

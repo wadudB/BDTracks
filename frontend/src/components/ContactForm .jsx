@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Grid, TextField, Button, Box, useMediaQuery } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -9,6 +10,8 @@ const ContactForm = () => {
     message: "",
   });
 
+  const theme = useTheme();
+
   const handleChange = (event) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   };
@@ -16,7 +19,7 @@ const ContactForm = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log(formData);
-    // Reset form fields
+    // Reset form
     setFormData({ name: "", email: "", message: "" });
   };
 
@@ -35,17 +38,17 @@ const ContactForm = () => {
         borderColor: "grey",
       },
       "&.Mui-focused fieldset": {
-        borderColor: "#c77676",
+        borderColor: theme.palette.text.highlight,
       },
     },
   });
 
-  // Styled button with hover color change
+  // Hover color
   const WhiteButton = styled(Button)({
-    color: "#CBD5E1",
-    borderColor: "#CBD5E1",
+    color: theme.palette.text.primary,
+    borderColor: theme.palette.text.primary,
     "&:hover": {
-      backgroundColor: "#c77676",
+      backgroundColor: theme.palette.text.highlight,
       color: "#000000",
     },
   });

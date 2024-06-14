@@ -9,7 +9,7 @@ const Footer = () => {
 
   return (
     <Box sx={{ mx: "auto", maxWidth: isSmallScreen ? "92%" : "85%", mt: 2 }}>
-      <Divider sx={{ borderColor: "#CBD5E1" }} />
+      <Divider sx={{ borderColor: theme.palette.text.primary }} />
       <Box
         sx={{
           mx: "auto",
@@ -30,7 +30,10 @@ const Footer = () => {
             target="_blank"
             rel="noopener noreferrer"
             underline="none"
-            sx={{ color: "inherit", "&:hover": { color: "#c77676" } }}
+            sx={{
+              color: "inherit",
+              "&:hover": { color: theme.palette.text.highlight },
+            }}
           >
             <FacebookIcon />
           </Link>

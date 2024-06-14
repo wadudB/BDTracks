@@ -12,10 +12,10 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PropTypes from "prop-types";
-
 import { Typography, Box, Button, Modal, TextField } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
-const WhiteTextField = styled(TextField)({
+const WhiteTextField = styled(TextField)(({ theme }) => ({
   "& label": {
     color: "grey",
   },
@@ -30,10 +30,11 @@ const WhiteTextField = styled(TextField)({
       borderColor: "grey",
     },
     "&.Mui-focused fieldset": {
-      borderColor: "#c77676",
+      borderColor: theme.palette.text.highlight,
     },
   },
-});
+}));
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#060522",
@@ -70,6 +71,7 @@ const AdminParty = ({ setParties, fetchParties, parties }) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingParty, setEditingParty] = useState(null);
+  const theme = useTheme();
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -80,7 +82,7 @@ const AdminParty = ({ setParties, fetchParties, parties }) => {
     setPage(0);
   };
 
-  // Handle edit click for a row
+  // Edit Data
   const handleEditClick = (party) => {
     setEditingParty(party);
     setEditModalOpen(true);
@@ -112,9 +114,9 @@ const AdminParty = ({ setParties, fetchParties, parties }) => {
         throw new Error("Failed to update Party");
       }
 
-      // Close the modal
+      // Close modal
       setEditModalOpen(false);
-      // Update local state with the new candidate data
+      // Update Party data
       fetchParties();
 
       alert("Party updated successfully");
@@ -123,7 +125,7 @@ const AdminParty = ({ setParties, fetchParties, parties }) => {
     }
   };
 
-  // Handle delete click for a row
+  // Delete party
   const handleDeleteClick = async (row) => {
     const confirmDelete = window.confirm(
       `Are you sure you want to delete ${row.party}?`
@@ -142,11 +144,10 @@ const AdminParty = ({ setParties, fetchParties, parties }) => {
           throw new Error("Error deleting Party");
         }
 
-        // Refresh the list or remove the item from the state
+        // Refresh the list
         const updatedData = parties.filter(
           (candidate) => candidate.party !== row.party
         );
-        // Update the state
         setParties(updatedData);
 
         alert("Party deleted successfully");
@@ -215,17 +216,17 @@ const AdminParty = ({ setParties, fetchParties, parties }) => {
         onRowsPerPageChange={handleChangeRowsPerPage}
         sx={{
           ".MuiTablePagination-toolbar": {
-            color: "white", // Change the pagination toolbar text to white
+            color: "white", // Pagination toolbar text
           },
           ".MuiTablePagination-selectLabel, .MuiTablePagination-select, .MuiTablePagination-selectIcon":
             {
-              color: "white", // Change the select and icon to white
+              color: "white", // Icon
             },
           ".MuiTablePagination-displayedRows": {
-            color: "white", // Change the displayed rows text to white
+            color: "white", // Rows text
           },
           ".MuiTablePagination-actions": {
-            color: "white", // Change the actions navigation arrows to white
+            color: "white", // Navigation arrows
           },
         }}
       />
@@ -316,7 +317,7 @@ const AdminParty = ({ setParties, fetchParties, parties }) => {
                 borderColor: "white",
                 mt: 2,
                 "&:hover": {
-                  backgroundColor: "#c77676",
+                  backgroundColor: theme.palette.text.highlight,
                   borderColor: "black",
                 },
               }}
@@ -330,6 +331,7 @@ const AdminParty = ({ setParties, fetchParties, parties }) => {
   );
 };
 
+// PropTypes
 AdminParty.propTypes = {
   setParties: PropTypes.func.isRequired,
   fetchParties: PropTypes.func.isRequired,
